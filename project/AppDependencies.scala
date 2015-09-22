@@ -1,6 +1,5 @@
 
-import sbt.Keys._
-import sbt.{ClasspathDependency, ExclusionRule, ModuleID, Project, ProjectRef, _}
+import sbt.{ExclusionRule, ModuleID, _}
 
 trait AppDependencies {
 
