@@ -6,6 +6,9 @@ trait AppDependencies {
   import App.BuildSettings._
   import App.Versions._
 
+  val json = "org.json" % "json" % "20141113"
+
+
   val scalaReflect = "org.scala-lang" % "scala-reflect" % buildScalaVersion
   val scalaParserCombinators = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.3"
 
