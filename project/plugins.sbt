@@ -1,5 +1,5 @@
 resolvers ++= Seq(
-  "gseitz@github" at "http://gseitz.github.com/maven/",
+  "gseitz@github" at "http://gseitz.github.com/maven/"
 )
 
 resolvers += Resolver.sonatypeRepo("releases")

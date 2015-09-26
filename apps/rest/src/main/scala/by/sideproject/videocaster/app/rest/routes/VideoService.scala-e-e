@@ -3,11 +3,17 @@ package by.sideproject.videocaster.app.rest.routes
 import akka.actor.ActorContext
 import by.sideproject.videocaster.model.VideoItemDetails
 import by.sideproject.videocaster.model.video.AddVideoRequest
+import by.sideproject.videocaster.services.storage.base.StorageService
+
+import scala.util.Random
 
 
-class VideoService(implicit context: ActorContext) extends BaseService {
+class VideoService(storageService: StorageService)(implicit context: ActorContext) extends BaseService {
 
   def actorRefFactory = context
+
+  val idGenerator = new Random()
+
 
   def route =
     pathPrefix("videos") {
@@ -18,17 +24,19 @@ class VideoService(implicit context: ActorContext) extends BaseService {
         get {
           respondWithMediaType(json) {
             complete {
-              Seq(
-                VideoItemDetails("1", "video1", "video1", None, "http://url.com", "2015.09.20"),
-                VideoItemDetails("2", "video2", "video2", Some("http://url.com/video.mpg"), "http://url.com", "2015.09.20")
-              )
+              storageService.videoItemDetailsDAO.findAll()
             }
           }
         } ~ post {
           entity(as[AddVideoRequest]) { addVideoRequest =>
             respondWithMediaType(json) {
               complete {
-                VideoItemDetails("123", "video1", "video1", None, addVideoRequest.baseUrl, "2015.09.20")
+                storageService.videoItemDetailsDAO.insert(
+                  VideoItemDetails(Some(idGenerator.nextLong().toString), "video1", "video1", None, addVideoRequest.baseUrl, "2015.09.20")
+                ).map{
+                  storageService.videoItemDetailsDAO.findOneById(_)
+                }
+
               }
             }
           }
@@ -38,7 +46,7 @@ class VideoService(implicit context: ActorContext) extends BaseService {
           get {
             respondWithMediaType(json) {
               complete {
-                VideoItemDetails(videoId, "video1", "video1", None, "http://url.com", "2015.09.20")
+                storageService.videoItemDetailsDAO.findOneById(videoId)
               }
             }
           }
