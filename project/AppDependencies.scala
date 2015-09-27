@@ -7,6 +7,7 @@ trait AppDependencies {
   import App.Versions._
 
   val json = "org.json" % "json" % "20141113"
+  val dropbox = "com.dropbox.core" % "dropbox-core-sdk" % dropboxVer
 
 
   val scalaReflect = "org.scala-lang" % "scala-reflect" % buildScalaVersion
@@ -30,10 +31,9 @@ trait AppDependencies {
 
   val config = "com.typesafe" % "config" % "1.0.0"
 
-  val logback = "ch.qos.logback" % "logback-classic" % logbackVer
+
   val logs = Seq(
-    logback,
-    "net.logstash.logback" % "logstash-logback-encoder" % "4.0",
+    "org.slf4j" % "slf4j-log4j12" % "1.7.12",
     "com.typesafe.akka" %% "akka-slf4j" % akkaVer
   )
 
