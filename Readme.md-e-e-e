@@ -27,4 +27,6 @@ curl -XGET -H "Content-type: application/json" http://localhost:8080/videos/132
 ```bash
 curl -XPOST -H "Content-type: application/json" http://localhost:8080/videos -d  ' { "baseUrl": "youtube" } '
 curl -XPOST -H "Content-type: application/json" http://localhost:8080/videos -d  ' { "baseUrl": "https://www.youtube.com/watch?v=e04d8ILXlKw" } '
+curl -XPOST -H "Content-type: application/json" http://localhost:8080/videos -d  ' { "baseUrl": "https://www.youtube.com/watch?v=OsOYg5gpS0s" } '
+curl -XPOST -H "Content-type: application/json" http://localhost:8080/videos -d  ' { "baseUrl": "https://www.youtube.com/watch?v=ApN73TUVMEU" } '
 ```

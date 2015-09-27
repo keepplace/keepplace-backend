@@ -1,13 +1,13 @@
 package by.sideproject.videocaster.app.rest
 
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.io.IO
-
 import akka.pattern.ask
 import akka.util.Timeout
 import by.sideproject.instavideo.filestorage.base.FileStorageService
 import by.sideproject.instavideo.filestorage.local.LocalFileStorageService
 import by.sideproject.videocaster.app.rest.actors.AppActor
+import by.sideproject.videocaster.services.downloader.async.{DownloadActor, AsynchronousDownloadService}
 import by.sideproject.videocaster.services.downloader.base.DownloadService
 import by.sideproject.videocaster.services.downloader.sync.SynchronusDownloadService
 import by.sideproject.videocaster.services.storage.base.StorageService
@@ -26,8 +26,11 @@ class ApplicationKernel extends akka.kernel.Bootable {
 
   implicit val youtubeDl = new YoutubeDL
 
-  implicit val downloadService : DownloadService = new SynchronusDownloadService(youtubeDl, metaStorageService, binaryStorageService)
-  implicit val timeout = Timeout(50.seconds)
+  implicit val synchDownloadService : DownloadService = new SynchronusDownloadService(youtubeDl, metaStorageService, binaryStorageService)
+  implicit val downloadActor : ActorRef = actorSystem.actorOf(Props(new DownloadActor(synchDownloadService)))
+  implicit val downloadService : DownloadService = new AsynchronousDownloadService(downloadActor)
+
+  implicit val timeout = Timeout(5.seconds)
 
 
   override def startup(): Unit = {
