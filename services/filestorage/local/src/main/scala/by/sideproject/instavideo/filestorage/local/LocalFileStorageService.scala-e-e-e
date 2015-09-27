@@ -57,5 +57,5 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO) extends FileStorageServi
 
   override def getInfo(id: String): Option[FileMeta] = fileMetaDao.findOneById(id)
 
-  private def fileURL(id: String) = "http://localhost:8080/data/" + id + "/download"
+  private def fileURL(id: String) = "http://192.168.1.4:8080/data/" + id + "/download"
 }

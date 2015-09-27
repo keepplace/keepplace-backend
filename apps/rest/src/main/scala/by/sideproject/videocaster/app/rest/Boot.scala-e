@@ -35,7 +35,7 @@ class ApplicationKernel extends akka.kernel.Bootable {
 
   override def startup(): Unit = {
     val service = actorSystem.actorOf(Props(new SprayApp(metaStorageService, downloadService, binaryStorageService)))
-    IO(Http) ? Http.Bind(service, interface = "localhost", port = 8080)
+    IO(Http) ? Http.Bind(service, interface = "0.0.0.0", port = 8080)
   }
 
   override def shutdown(): Unit = {

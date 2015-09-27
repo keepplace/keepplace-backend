@@ -14,11 +14,16 @@ class YoutubeDL {
 
     val jsonData = scala.io.Source.fromInputStream(inputStream).mkString
     val youtubeDlJsonOutput: JSONObject = new JSONObject(jsonData)
+
     val fileName: String = youtubeDlJsonOutput.getString("_filename")
+    val title: String = youtubeDlJsonOutput.getString("fulltitle")
+    val description: String = youtubeDlJsonOutput.getString("description")
+    val author: String = youtubeDlJsonOutput.getString("uploader")
+    val pubDate: String = youtubeDlJsonOutput.getString("upload_date") //20150820
 
     youtubeDlProcess.waitFor
 
-    DownloadedFileInfo(fileName, youtubeDlJsonOutput.toString(4))
+    DownloadedFileInfo(fileName, title, description, pubDate, author, youtubeDlJsonOutput.toString(4))
   }
 
 //  private val command = "youtube-dl -o filestorage/%(uploader)s/%(title)s-%(id)s.%(ext)s -f bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4 --print-json "

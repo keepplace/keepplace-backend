@@ -8,6 +8,7 @@ import by.sideproject.videocaster.services.youtubedl.YoutubeDL
 import org.slf4j.LoggerFactory
 
 
+
 class SynchronusDownloadService(youDl: YoutubeDL, storage: StorageService, binaryStorageService: FileStorageService) extends DownloadService {
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -21,10 +22,15 @@ class SynchronusDownloadService(youDl: YoutubeDL, storage: StorageService, binar
     log.debug("Storing data in local file storage: " + downloadInfo.fileName)
     val storedDataOption = binaryStorageService.upload(downloadInfo.fileName)
 
-
-
     storedDataOption.map { storedData =>
-      val updatedVideItemDetails = item.copy(fileMetaId = storedData.id, status = "downloaded")
+      val updatedVideItemDetails = item.copy(
+        title = Some(downloadInfo.title),
+        description = Some(downloadInfo.description),
+        author = Some(downloadInfo.author),
+        pubDate = Some(downloadInfo.pubDate),
+        fileMetaId = storedData.id,
+        status = "downloaded"
+      )
       log.debug("Updating an information about video file: " + updatedVideItemDetails)
 
       storage.videoItemDetailsDAO.update(updatedVideItemDetails)
