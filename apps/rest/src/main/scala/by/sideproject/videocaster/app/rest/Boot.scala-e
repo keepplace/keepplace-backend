@@ -20,9 +20,10 @@ import scala.concurrent.duration._
 
 class ApplicationKernel extends akka.kernel.Bootable {
 
+  import by.sideproject.videocaster.app.rest.config.Config._
   implicit val actorSystem = ActorSystem("instacaster")
   implicit val metaStorageService: StorageService = InmemoryStorageService
-  implicit val binaryStorageService: FileStorageService = new LocalFileStorageService(metaStorageService.fileMetaDAO)
+  implicit val binaryStorageService: FileStorageService = new LocalFileStorageService(metaStorageService.fileMetaDAO, domain)
 
   implicit val youtubeDl = new YoutubeDL
 
@@ -34,8 +35,8 @@ class ApplicationKernel extends akka.kernel.Bootable {
 
 
   override def startup(): Unit = {
-    val service = actorSystem.actorOf(Props(new SprayApp(metaStorageService, downloadService, binaryStorageService)))
-    IO(Http) ? Http.Bind(service, interface = "0.0.0.0", port = 8080)
+    val service = actorSystem.actorOf(Props(new SprayApp(metaStorageService, downloadService, binaryStorageService, domain)))
+    IO(Http) ? Http.Bind(service, interface = bindInterface, port = bindPort)
   }
 
   override def shutdown(): Unit = {

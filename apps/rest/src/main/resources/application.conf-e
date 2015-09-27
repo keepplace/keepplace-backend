@@ -7,3 +7,11 @@ akka {
 spray.can.server {
   request-timeout = 50s
 }
+
+application {
+  external-host = "192.168.1.4:8080"
+  bind {
+    interface = "0.0.0.0"
+    port = 8080
+  }
+}

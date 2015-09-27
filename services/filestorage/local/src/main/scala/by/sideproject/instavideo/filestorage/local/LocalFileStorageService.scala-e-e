@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 
 import scala.util.Random
 
-class LocalFileStorageService(fileMetaDao: FileMetaDAO) extends FileStorageService {
+class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends FileStorageService {
 
   val log = LoggerFactory.getLogger(this.getClass)
 
@@ -57,5 +57,5 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO) extends FileStorageServi
 
   override def getInfo(id: String): Option[FileMeta] = fileMetaDao.findOneById(id)
 
-  private def fileURL(id: String) = "http://192.168.1.4:8080/data/" + id + "/download"
+  private def fileURL(id: String) = "http://" + domain + "/data/" + id + "/download"
 }

@@ -7,7 +7,9 @@ import spray.http.MediaTypes._
 import spray.http._
 import spray.httpx.marshalling.Marshaller
 
-class RssRequestHandler(storageService: StorageService)(implicit context: ActorContext) extends BaseService {
+class RssRequestHandler(storageService: StorageService, domain: String)
+                       (implicit context: ActorContext)
+  extends BaseService {
 
   def actorRefFactory = context
 
@@ -42,17 +44,17 @@ class RssRequestHandler(storageService: StorageService)(implicit context: ActorC
     }
 
 
-  def podcastChannelMarshaller(contentType: ContentType, more: ContentType*): Marshaller[PodcastChannel] =
+  private def podcastChannelMarshaller(contentType: ContentType, more: ContentType*): Marshaller[PodcastChannel] =
     Marshaller.delegate[PodcastChannel, xml.NodeSeq](contentType +: more: _*) { (data: PodcastChannel) ⇒
       <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
         <channel>
-          <atom:link href="http://localhost:8080/rss/" type="application/rss+xml" rel="self"></atom:link>
+          <atom:link href="" type="application/rss+xml" rel="self"></atom:link>
           <itunes:owner>
             <itunes:email>info@sideproject.by</itunes:email>
           </itunes:owner>
           <language>ru-ru</language>
           <itunes:explicit>no</itunes:explicit>
-          <link>http://localhost:8080/</link>
+          <link>http://{domain}/</link>
           <title>My instavideo feed</title>
           <description>
             Description: My instavideo feed
@@ -61,13 +63,14 @@ class RssRequestHandler(storageService: StorageService)(implicit context: ActorC
             Description: My instavideo feed
           </itunes:summary>
           <itunes:author>info@sideproject.by</itunes:author>
-          <category>all</category>
-          <lastBuildDate>Sun, 27 Sep 2015 18:45:09 +0300</lastBuildDate>{podcastItemsMarshaller(data.items)}
+          {podcastItemsMarshaller(data.items)}
         </channel>
       </rss>
     }
 
-  def podcastItemsMarshaller(items: Seq[PodcastItem]): xml.NodeSeq =
+  private def rssUrl = "http://" + domain + "/rss/"
+
+  private def podcastItemsMarshaller(items: Seq[PodcastItem]): xml.NodeSeq =
     items.map { data =>
       <item>
         <title>
