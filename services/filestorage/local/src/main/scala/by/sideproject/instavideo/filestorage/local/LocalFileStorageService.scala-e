@@ -41,12 +41,19 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO) extends FileStorageServi
       import java.nio.file.{Files, Paths}
       val data = Files.readAllBytes(Paths.get(fileMeta.path))
 
-
       FileData(fileMeta, data)
     }
   }
 
-  override def remove(id: String): Unit = fileMetaDao.removeById(id)
+  override def remove(id: String): Unit = {
+    getInfo(id).map { fileForRemoval =>
+      log.debug("Removing file from the file storage")
+
+      fileForRemoval.id.map(fileMetaDao.removeById(_))
+
+      log.warn("TODO/ Remove file from file system")
+    }
+  }
 
   override def getInfo(id: String): Option[FileMeta] = fileMetaDao.findOneById(id)
 

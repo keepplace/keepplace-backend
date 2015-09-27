@@ -6,7 +6,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import by.sideproject.instavideo.filestorage.base.FileStorageService
 import by.sideproject.instavideo.filestorage.local.LocalFileStorageService
-import by.sideproject.videocaster.app.rest.actors.AppActor
+import by.sideproject.videocaster.app.rest.actors.SprayApp
 import by.sideproject.videocaster.services.downloader.async.{DownloadActor, AsynchronousDownloadService}
 import by.sideproject.videocaster.services.downloader.base.DownloadService
 import by.sideproject.videocaster.services.downloader.sync.SynchronusDownloadService
@@ -34,7 +34,7 @@ class ApplicationKernel extends akka.kernel.Bootable {
 
 
   override def startup(): Unit = {
-    val service = actorSystem.actorOf(Props(new AppActor(metaStorageService, downloadService, binaryStorageService)))
+    val service = actorSystem.actorOf(Props(new SprayApp(metaStorageService, downloadService, binaryStorageService)))
     IO(Http) ? Http.Bind(service, interface = "localhost", port = 8080)
   }
 

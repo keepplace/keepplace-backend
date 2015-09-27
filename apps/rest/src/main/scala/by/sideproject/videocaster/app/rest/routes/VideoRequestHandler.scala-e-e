@@ -7,12 +7,14 @@ import by.sideproject.videocaster.model.VideoItemDetails
 import by.sideproject.videocaster.model.video.AddVideoRequest
 import by.sideproject.videocaster.services.downloader.base.DownloadService
 import by.sideproject.videocaster.services.storage.base.StorageService
+import by.sideproject.videocaster.services.storage.base.dao.VideoItemDetailsDAO
 import org.slf4j.LoggerFactory
+import spray.http.StatusCodes
 
 import scala.util.Random
 
 
-class VideoService(storageService: StorageService, downloadService: DownloadService, binaryStorageService: FileStorageService)(implicit context: ActorContext) extends BaseService {
+class VideoRequestHandler(storageService: StorageService, downloadService: DownloadService, binaryStorageService: FileStorageService)(implicit context: ActorContext) extends BaseService {
 
   protected val log = LoggerFactory.getLogger(this.getClass)
 
@@ -20,17 +22,19 @@ class VideoService(storageService: StorageService, downloadService: DownloadServ
 
   val idGenerator = new Random()
 
+  val videoDetailsDAO: VideoItemDetailsDAO = storageService.videoItemDetailsDAO
 
   def route =
     pathPrefix("videos") {
       import by.sideproject.videocaster.app.rest.formaters.json.InstaVideoJsonProtocol._
       import spray.httpx.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
 
+
       pathEnd {
         get {
           respondWithMediaType(json) {
             complete {
-              storageService.videoItemDetailsDAO.findAll()
+              videoDetailsDAO.findAll()
             }
           }
         } ~ post {
@@ -45,11 +49,11 @@ class VideoService(storageService: StorageService, downloadService: DownloadServ
                 val videoItemDetails: VideoItemDetails = VideoItemDetails(newId, "video1", "video1", None, addVideoRequest.baseUrl, "2015.09.20", "added")
 
                 log.debug("Saving newly created video item: " + videoItemDetails)
-                storageService.videoItemDetailsDAO.insert(
+                videoDetailsDAO.insert(
                   videoItemDetails
                 ).map { id =>
 
-                  val addedVideoItemEntry = storageService.videoItemDetailsDAO.findOneById(id)
+                  val addedVideoItemEntry = videoDetailsDAO.findOneById(id)
 
                   log.debug("Initiating download of video file for: " + videoItemDetails)
                   addedVideoItemEntry.map(videoItem => downloadService.download(videoItem))
@@ -69,11 +73,24 @@ class VideoService(storageService: StorageService, downloadService: DownloadServ
             get {
               respondWithMediaType(json) {
                 complete {
-                  storageService.videoItemDetailsDAO.findOneById(videoId)
+                  videoDetailsDAO.findOneById(videoId)
                 }
+              }
+            } ~ delete {
+              respondWithMediaType(json) {
+
+                videoDetailsDAO.findOneById(videoId).flatMap {
+
+                  videoDetailsDAO.removeById(videoId)
+
+                  _.fileMetaId
+                }.map(binaryStorageService.remove)
+
+                complete(StatusCodes.OK)
               }
             }
           }
+
 
         }
 

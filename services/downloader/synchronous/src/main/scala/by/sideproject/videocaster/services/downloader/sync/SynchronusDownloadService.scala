@@ -24,7 +24,7 @@ class SynchronusDownloadService(youDl: YoutubeDL, storage: StorageService, binar
 
 
     storedDataOption.map { storedData =>
-      val updatedVideItemDetails = item.copy(downloadUrl = Some(storedData.downloadURL), status = "downloaded")
+      val updatedVideItemDetails = item.copy(fileMetaId = storedData.id, status = "downloaded")
       log.debug("Updating an information about video file: " + updatedVideItemDetails)
 
       storage.videoItemDetailsDAO.update(updatedVideItemDetails)

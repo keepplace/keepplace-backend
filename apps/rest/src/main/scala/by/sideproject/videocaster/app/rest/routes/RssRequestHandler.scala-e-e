@@ -7,7 +7,7 @@ import spray.http.MediaTypes._
 import spray.http._
 import spray.httpx.marshalling.Marshaller
 
-class RssService(storageService: StorageService)(implicit context: ActorContext) extends BaseService {
+class RssRequestHandler(storageService: StorageService)(implicit context: ActorContext) extends BaseService {
 
   def actorRefFactory = context
 
@@ -17,8 +17,20 @@ class RssService(storageService: StorageService)(implicit context: ActorContext)
       get {
         respondWithMediaType(`application/xml`) {
           complete {
+
             PodcastChannel(
-              Seq(PodcastItem("title1", "description1", "http://url.com"), PodcastItem("title2", "description2", "http://url.com"))
+              storageService
+                .videoItemDetailsDAO
+                .findAll()
+                .filter(_.isDownloaded)
+                .flatMap(item =>
+                item.fileMetaId.flatMap(binaryFileId =>
+                  storageService.fileMetaDAO.findOneById(binaryFileId).map(fileMeta =>
+                    PodcastItem(item.name, item.description, fileMeta.downloadURL)
+                  )
+                )
+                )
+
             )
           }
         }
@@ -42,7 +54,7 @@ class RssService(storageService: StorageService)(implicit context: ActorContext)
         <description>
           {data.description}
         </description>
-        <enclosure url={data.downloadUrl} type="video/mpeg"/>
+        <enclosure url={data.downloadUrl} type="video/mp4"/>
       </item>
     }
 

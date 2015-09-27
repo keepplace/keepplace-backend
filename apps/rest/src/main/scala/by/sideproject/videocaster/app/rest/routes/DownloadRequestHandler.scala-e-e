@@ -8,7 +8,7 @@ import spray.http.HttpData
 import spray.http.HttpHeaders.RawHeader
 
 
-class DownloadsService(binaryStorageService: FileStorageService)(implicit context: ActorContext) extends BaseService {
+class DownloadRequestHandler(binaryStorageService: FileStorageService)(implicit context: ActorContext) extends BaseService {
 
   val log = LoggerFactory.getLogger(this.getClass)
 
@@ -25,7 +25,6 @@ class DownloadsService(binaryStorageService: FileStorageService)(implicit contex
               respondWithMediaType(mp4) {
                 respondWithHeader(RawHeader("Content-Disposition", "attachment; filename='" + binaryData.meta.name + "'")) {
                   log.debug("Sending binary information by fileId: " + binaryData.meta)
-
                   complete {
                     HttpData(binaryData.data)
                   }

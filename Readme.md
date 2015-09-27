@@ -30,3 +30,9 @@ curl -XPOST -H "Content-type: application/json" http://localhost:8080/videos -d 
 curl -XPOST -H "Content-type: application/json" http://localhost:8080/videos -d  ' { "baseUrl": "https://www.youtube.com/watch?v=OsOYg5gpS0s" } '
 curl -XPOST -H "Content-type: application/json" http://localhost:8080/videos -d  ' { "baseUrl": "https://www.youtube.com/watch?v=ApN73TUVMEU" } '
 ```
+
+
+#### Removing video (and data files)
+```bash
+curl -XDELETE -H "Content-type: application/json" http://localhost:8080/videos/9082999699819251973
+```
