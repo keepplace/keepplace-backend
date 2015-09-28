@@ -1,4 +1,5 @@
 ## Get started
+### Installing deps
 ```bash
 brew install youtube-dl ffmpeg libav
 ```
