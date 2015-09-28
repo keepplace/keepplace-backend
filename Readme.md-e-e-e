@@ -1,3 +1,8 @@
+## Get started
+```bash
+brew install youtube-dl ffmpeg libav
+```
+
 ## Development
 ### Running application
 ```bash
