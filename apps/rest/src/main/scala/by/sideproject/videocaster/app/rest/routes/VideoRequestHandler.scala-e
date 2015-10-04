@@ -45,7 +45,9 @@ class VideoRequestHandler(storageService: StorageService,
                 complete {
 
                   val newId: Some[String] = Some(Math.abs(idGenerator.nextLong()).toString)
-                  val videoItemDetails: VideoItemDetails = VideoItemDetails(newId, None, None, None, addVideoRequest.baseUrl, "2015.09.20", "added", None, None)
+
+                  val videoItemDetails: VideoItemDetails = downloadService.getVideoDetails(addVideoRequest.baseUrl).copy(id = newId)
+
 
                   log.debug("Saving newly created video item: " + videoItemDetails)
                   videoDetailsDAO.insert(

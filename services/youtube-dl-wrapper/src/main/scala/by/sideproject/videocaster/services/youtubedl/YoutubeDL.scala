@@ -7,8 +7,10 @@ import org.json.JSONObject
 
 class YoutubeDL {
 
-  def download(url: String): DownloadedFileInfo = {
+  def download(url: String): DownloadedFileInfo = execute(downloadCommand, url)
+  def getInfo(url: String): DownloadedFileInfo = execute(getInfoCommand, url)
 
+  private def execute(command: String, url: String) = {
     val youtubeDlProcess = Runtime.getRuntime.exec(command + url)
     val inputStream: InputStream = youtubeDlProcess.getInputStream
 
@@ -26,7 +28,7 @@ class YoutubeDL {
     DownloadedFileInfo(fileName, title, description, pubDate, author, youtubeDlJsonOutput.toString(4))
   }
 
-//  private val command = "youtube-dl -o filestorage/%(uploader)s/%(title)s-%(id)s.%(ext)s -f bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4 --print-json "
-  private val command = "youtube-dl -o filestorage/%(uploader)s/%(title)s-%(id)s.%(ext)s -f mp4 --print-json "
+  private lazy val getInfoCommand = downloadCommand + " --simulate "
+  private lazy val downloadCommand = "youtube-dl -o filestorage/%(uploader)s/%(title)s-%(id)s.%(ext)s -f mp4 --print-json "
 }
 

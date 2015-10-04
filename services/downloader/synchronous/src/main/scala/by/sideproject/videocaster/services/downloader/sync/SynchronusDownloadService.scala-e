@@ -8,10 +8,16 @@ import by.sideproject.videocaster.services.youtubedl.YoutubeDL
 import org.slf4j.LoggerFactory
 
 
-
-class SynchronusDownloadService(youDl: YoutubeDL, storage: StorageService, binaryStorageService: FileStorageService) extends DownloadService {
+class SynchronusDownloadService(youDl: YoutubeDL, storage: StorageService, binaryStorageService: FileStorageService)
+  extends DownloadService {
   private val log = LoggerFactory.getLogger(this.getClass)
 
+  override def getVideoDetails(url: String): VideoItemDetails = {
+    log.debug("Fetching information on video file: " + url)
+    val videoInfo = youDl.getInfo(url)
+    log.debug("Information on video item has been retrieved: " + videoInfo)
+    VideoItemDetails(None, Some(videoInfo.title), Some(videoInfo.description), None, url, "today", "info", Some(videoInfo.pubDate), Some(videoInfo.author))
+  }
 
   override def download(item: VideoItemDetails): Unit = {
 
