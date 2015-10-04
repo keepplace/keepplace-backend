@@ -7,8 +7,7 @@ import akka.util.Timeout
 import by.sideproject.instavideo.filestorage.base.FileStorageService
 import by.sideproject.instavideo.filestorage.local.LocalFileStorageService
 import by.sideproject.videocaster.app.rest.actors.SprayApp
-import by.sideproject.videocaster.app.rest.oauth.base.{InmemorySessionStore, SessionStore}
-import by.sideproject.videocaster.services.downloader.async.{DownloadActor, AsynchronousDownloadService}
+import by.sideproject.videocaster.services.downloader.async.{AsynchronousDownloadService, DownloadActor}
 import by.sideproject.videocaster.services.downloader.base.DownloadService
 import by.sideproject.videocaster.services.downloader.sync.SynchronusDownloadService
 import by.sideproject.videocaster.services.storage.base.StorageService
@@ -32,13 +31,11 @@ class ApplicationKernel extends akka.kernel.Bootable {
   implicit val downloadActor : ActorRef = actorSystem.actorOf(Props(new DownloadActor(synchDownloadService)).withDispatcher("binary-download-dispatcher"))
   implicit val downloadService : DownloadService = new AsynchronousDownloadService(downloadActor)
 
-  implicit  val sessionStore: SessionStore = new InmemorySessionStore()
-
   implicit val timeout = Timeout(5.seconds)
 
 
   override def startup(): Unit = {
-    val service = actorSystem.actorOf(Props(new SprayApp(metaStorageService, downloadService, binaryStorageService, domain, sessionStore)))
+    val service = actorSystem.actorOf(Props(new SprayApp(metaStorageService, downloadService, binaryStorageService, domain)))
     IO(Http) ? Http.Bind(service, interface = bindInterface, port = bindPort)
   }
 

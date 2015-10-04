@@ -1,9 +1,7 @@
 package by.sideproject.videocaster.app.rest.routes
 
 import akka.actor.ActorContext
-import akka.event.Logging
 import by.sideproject.instavideo.filestorage.base.FileStorageService
-import by.sideproject.videocaster.app.rest.oauth.base.SessionStore
 import by.sideproject.videocaster.app.rest.oauth.dropbox.DropboxAuthService
 import by.sideproject.videocaster.model.VideoItemDetails
 import by.sideproject.videocaster.model.video.AddVideoRequest
@@ -18,9 +16,8 @@ import scala.util.Random
 
 class VideoRequestHandler(storageService: StorageService,
                           downloadService: DownloadService,
-                          binaryStorageService: FileStorageService,
-                          sessionStore: SessionStore)(implicit context: ActorContext)
-  extends DropboxAuthService(sessionStore)
+                          binaryStorageService: FileStorageService)(implicit context: ActorContext)
+  extends DropboxAuthService(storageService.identityDAO)
   with BaseService {
 
   protected val log = LoggerFactory.getLogger(this.getClass)
@@ -33,7 +30,7 @@ class VideoRequestHandler(storageService: StorageService,
     pathPrefix("videos") {
       authenticate(cookieAuth) { user =>
         import by.sideproject.videocaster.app.rest.formaters.json.InstaVideoJsonProtocol._
-        import spray.httpx.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
+        import spray.httpx.SprayJsonSupport.sprayJsonUnmarshaller
 
         pathEnd {
           get {

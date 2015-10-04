@@ -1,7 +1,6 @@
 package by.sideproject.videocaster.app.rest.routes
 
 import akka.actor.ActorContext
-import by.sideproject.videocaster.app.rest.oauth.base.SessionStore
 import by.sideproject.videocaster.app.rest.oauth.dropbox.DropboxAuthService
 import by.sideproject.videocaster.model.rss.{PodcastChannel, PodcastItem}
 import by.sideproject.videocaster.services.storage.base.StorageService
@@ -10,9 +9,9 @@ import spray.httpx.marshalling.Marshaller
 
 import scala.xml.Elem
 
-class RssRequestHandler(storageService: StorageService, domain: String, sessionStore: SessionStore)
+class RssRequestHandler(storageService: StorageService, domain: String)
                        (implicit context: ActorContext)
-  extends DropboxAuthService(sessionStore)
+  extends DropboxAuthService(storageService.identityDAO)
   with BaseService {
 
   def route =

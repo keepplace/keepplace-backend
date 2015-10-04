@@ -1,14 +1,13 @@
 package by.sideproject.videocaster.app.rest.routes
 
 import akka.actor.ActorContext
-import by.sideproject.videocaster.app.rest.oauth.base.{SessionStore, AuthService, OAuth2Provider}
-import by.sideproject.videocaster.app.rest.oauth.dropbox.{DropboxAuthService, DropboxProvider}
+import by.sideproject.videocaster.app.rest.oauth.dropbox.DropboxAuthService
 import by.sideproject.videocaster.services.storage.base.StorageService
 import org.slf4j.LoggerFactory
 
-class LoginHandler(storageService: StorageService, domain: String, sessionStore: SessionStore)
+class LoginHandler(storageService: StorageService, domain: String)
                   (implicit context: ActorContext)
-  extends DropboxAuthService(sessionStore)
+  extends DropboxAuthService(storageService.identityDAO)
   with BaseService {
 
 

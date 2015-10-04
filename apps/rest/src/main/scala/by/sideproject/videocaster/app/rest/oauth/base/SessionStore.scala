@@ -20,8 +20,6 @@ trait SessionStore {
   def removeSession(sessionId: String) =
     sessionStore -= sessionId
 
-  def getRandomSessionId: String = UUID.randomUUID().toString
-
 }
 
 
