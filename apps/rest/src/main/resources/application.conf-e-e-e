@@ -16,6 +16,29 @@ application {
   }
 }
 
+spray-oauth2-client {
+
+  callbackUrl = "http://localhost:8080/auth/oauth2callback"
+  sessionName = "SID"
+
+  callbackRoute = "oauth2callback"
+  redirectRoute = "oauth2redirect"
+  onLoginGoTo="/auth/profile"
+
+
+  dropbox {
+    authorizationUrl = "https://www.dropbox.com/1/oauth2/authorize"
+    accessTokenUrl = "https://api.dropboxapi.com/1/oauth2/token"
+    clientId = "4rnexfzxkej2y11"
+    clientSecret = "gpbo0wzi0wcv2fq"
+    scopes = []
+  }
+
+
+}
+
+
+
 
 binary-download-dispatcher {
 

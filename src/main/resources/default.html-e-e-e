@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Spray Oauth2 Client</title>
+</head>
+
+<body>
+    <p>
+        To authenticate your self click <a href='oauth2redirect'>here</a>.
+        <br>
+        <a href='no-auth'>This page</a> requires no authentication
+
+        <br>To learn your UID you can click <a href='uid'>here</a> you have to authenticate your self first.
+    </p>
+
+</body>
+
+</html>

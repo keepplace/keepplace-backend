@@ -9,7 +9,7 @@ object VideoPodcastDownloader extends Build {
   lazy val root = baseProject("video-podcast-downloader-rest", "apps/rest")
     .aggregate(storageService, inMemoryStorageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, localFileStorageService, fileStorageService)
     .dependsOn(storageService, inMemoryStorageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, localFileStorageService, fileStorageService)
-    .settings(libraryDependencies ++= Seq(config, scalazCore, playJson) ++ spray ++ metrics ++ logs ++ akka)
+    .settings(libraryDependencies ++= Seq(config, scalazCore, playJson) ++ spray ++ metrics ++ logs ++ akka ++ Seq(dropbox) ++ oauth)
 
 
   lazy val storageService = baseProject("storage-base", "services/storage/base") dependsOn (models)

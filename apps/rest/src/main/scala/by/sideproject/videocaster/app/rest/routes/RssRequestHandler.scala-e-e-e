@@ -1,54 +1,61 @@
 package by.sideproject.videocaster.app.rest.routes
 
 import akka.actor.ActorContext
+import by.sideproject.videocaster.app.rest.oauth.base.SessionStore
+import by.sideproject.videocaster.app.rest.oauth.dropbox.DropboxAuthService
 import by.sideproject.videocaster.model.rss.{PodcastChannel, PodcastItem}
 import by.sideproject.videocaster.services.storage.base.StorageService
-import spray.http.MediaTypes._
 import spray.http._
 import spray.httpx.marshalling.Marshaller
 
-class RssRequestHandler(storageService: StorageService, domain: String)
-                       (implicit context: ActorContext)
-  extends BaseService {
+import scala.xml.Elem
 
-  def actorRefFactory = context
+class RssRequestHandler(storageService: StorageService, domain: String, sessionStore: SessionStore)
+                       (implicit context: ActorContext)
+  extends DropboxAuthService(sessionStore)
+  with BaseService {
 
   def route =
+
     path("rss") {
-      implicit val PodcatChannelMarshaller = podcastChannelMarshaller(`application/xml`, `application/xml`)
-      get {
-        respondWithMediaType(`application/xml`) {
-          complete {
-
-            PodcastChannel(
-              storageService
-                .videoItemDetailsDAO
-                .findAll()
-                .filter(_.isDownloaded)
-                .flatMap(item =>
-                item.fileMetaId.flatMap(binaryFileId =>
-                  storageService.fileMetaDAO.findOneById(binaryFileId).map(fileMeta =>
-                    PodcastItem(item.title.getOrElse(""),
-                      item.description.getOrElse(""),
-                      item.author.getOrElse(""),
-                      item.pubDate.getOrElse(""),
-                      fileMeta.downloadURL)
-                  )
-                )
-                )
-
-            )
+      authenticate(cookieAuth) { user =>
+        implicit val PodcatChannelMarshaller = podcastChannelMarshaller(xml, xml)
+        pathEnd {
+          get {
+            respondWithMediaType(xml) {
+              complete {
+                PodcastChannel(getPodcastItems)
+              }
+            }
           }
         }
       }
     }
 
 
+  private def getPodcastItems: Vector[PodcastItem] = {
+    storageService
+      .videoItemDetailsDAO
+      .findAll()
+      .filter(_.isDownloaded)
+      .flatMap(item =>
+      item.fileMetaId.flatMap(binaryFileId =>
+        storageService.fileMetaDAO.findOneById(binaryFileId).map(fileMeta =>
+          PodcastItem(item.title.getOrElse(""),
+            item.description.getOrElse(""),
+            item.author.getOrElse(""),
+            item.pubDate.getOrElse(""),
+            fileMeta.downloadURL)
+        )
+      )
+      )
+  }
+
   private def podcastChannelMarshaller(contentType: ContentType, more: ContentType*): Marshaller[PodcastChannel] =
-    Marshaller.delegate[PodcastChannel, xml.NodeSeq](contentType +: more: _*) { (data: PodcastChannel) ⇒
+    Marshaller.delegate[PodcastChannel, Elem](contentType +: more: _*) { (data: PodcastChannel) ⇒
       <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
         <channel>
-          <atom:link href="" type="application/rss+xml" rel="self"></atom:link>
+          <atom:link href={rssUrl} type="application/rss+xml" rel="self"></atom:link>
           <itunes:owner>
             <itunes:email>info@sideproject.by</itunes:email>
           </itunes:owner>
@@ -62,15 +69,14 @@ class RssRequestHandler(storageService: StorageService, domain: String)
           <itunes:summary>
             Description: My instavideo feed
           </itunes:summary>
-          <itunes:author>info@sideproject.by</itunes:author>
-          {podcastItemsMarshaller(data.items)}
+          <itunes:author>info@sideproject.by</itunes:author>{podcastItemsMarshaller(data.items)}
         </channel>
       </rss>
     }
 
   private def rssUrl = "http://" + domain + "/rss/"
 
-  private def podcastItemsMarshaller(items: Seq[PodcastItem]): xml.NodeSeq =
+  private def podcastItemsMarshaller(items: Seq[PodcastItem]) =
     items.map { data =>
       <item>
         <title>

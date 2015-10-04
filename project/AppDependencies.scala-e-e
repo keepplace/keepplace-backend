@@ -41,12 +41,17 @@ trait AppDependencies {
 
   val nscalaTime = "com.github.nscala-time" %% "nscala-time" % "1.8.0"
 
+  val oauth = Seq("com.google.oauth-client" % "google-oauth-client" % oauthVer,
+    "com.google.oauth-client" % "google-oauth-client-java6" % oauthVer,
+    "com.google.http-client" % "google-http-client-jackson2" % oauthVer)
+
   val sprayRouting = "io.spray" %% "spray-routing-shapeless2" % sprayVer
   val sprayCan = "io.spray" %% "spray-can" % sprayVer
   val spray = Seq(
     sprayCan,
     sprayRouting,
     "io.spray" %% "spray-json" % sprayJsonVer
+
   )
   val sprayClient = "io.spray" %% "spray-client" % sprayVer
 
