@@ -20,11 +20,15 @@ class LoginHandler(storageService: StorageService, domain: String)
 
   lazy val authRoutes =
     path("profile") {
-      authenticate(cookieAuth) { userInfo =>
-        pathEnd {
-          get {
-            complete {
-              "SessionId: " + userInfo
+      import by.sideproject.videocaster.app.rest.formaters.json.InstaVideoJsonProtocol._
+      import spray.httpx.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
+
+      respondWithMediaType(json) {
+
+        authenticate(cookieAuth) { userInfo =>
+          pathEnd {
+            get {
+              complete(userInfo)
             }
           }
         }
