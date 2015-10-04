@@ -1,6 +1,7 @@
 package by.sideproject.videocaster.app.rest.formaters.json
 
-import by.sideproject.videocaster.app.rest.oauth.base.{OAuth2Constants, OAuth2Info}
+import by.sideproject.videocaster.app.rest.oauth.base.OAuth2Constants
+import by.sideproject.videocaster.model.auth.oauth.OAuth2Info
 import spray.json._
 
 object DropboxOAuth2InfoProtocol extends DefaultJsonProtocol {

@@ -1,9 +1,10 @@
 package by.sideproject.videocaster.app.rest.oauth.dropbox
 
 import by.sideproject.videocaster.app.rest.formaters.json.DropboxJsonProtocol
-import by.sideproject.videocaster.app.rest.oauth.base.model.Identity
-import by.sideproject.videocaster.app.rest.oauth.base.{OAuth2Info, OAuth2Provider}
+import by.sideproject.videocaster.app.rest.oauth.base.OAuth2Provider
 import by.sideproject.videocaster.app.rest.oauth.base.utils.OauthConfig
+import by.sideproject.videocaster.model.auth.Identity
+import by.sideproject.videocaster.model.auth.oauth.OAuth2Info
 import com.google.api.client.auth.oauth2.{AuthorizationCodeRequestUrl, AuthorizationCodeTokenRequest, ClientParametersAuthentication}
 import com.google.api.client.http.GenericUrl
 import com.google.api.client.http.javanet.NetHttpTransport

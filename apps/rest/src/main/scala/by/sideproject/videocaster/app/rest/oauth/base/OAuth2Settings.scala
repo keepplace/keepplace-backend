@@ -2,6 +2,8 @@ package by.sideproject.videocaster.app.rest.oauth.base
 
 import java.util
 
+import spray.http.OAuth2BearerToken
+
 /**
  * The settings for OAuth2 providers.
  */
@@ -35,16 +37,6 @@ object OAuth2Settings {
     OAuth2Settings(authorizationUrl.toString, accessTokenUrl.toString, clientId.toString, clientSecret.toString, scopes)
   }
 }
-
-
-case class OAuth2Info(accessToken: String,
-                      tokenType: Option[String] = None,
-                      expiresIn: Option[Long] = None,
-                      IdToken:Option[String] = None,
-                      refreshToken:Option[String] = None)
-
-
-
 
 
 

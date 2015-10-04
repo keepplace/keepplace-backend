@@ -2,7 +2,7 @@ package by.sideproject.videocaster.app.rest.oauth.base
 
 import java.util.UUID
 
-import by.sideproject.videocaster.app.rest.oauth.base.model.Identity
+import by.sideproject.videocaster.model.auth.Identity
 
 import scala.Predef._
 

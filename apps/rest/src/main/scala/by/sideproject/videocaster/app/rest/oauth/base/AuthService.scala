@@ -1,7 +1,7 @@
 package by.sideproject.videocaster.app.rest.oauth.base
 
-import by.sideproject.videocaster.app.rest.oauth.base.model.Identity
 import by.sideproject.videocaster.app.rest.oauth.base.utils.OauthConfig
+import by.sideproject.videocaster.model.auth.Identity
 import org.slf4j.LoggerFactory
 import spray.http.HttpCookie
 import spray.http.StatusCodes._

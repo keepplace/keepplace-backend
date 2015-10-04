@@ -1,6 +1,6 @@
-package by.sideproject.videocaster.app.rest.oauth.base.model
+package by.sideproject.videocaster.model.auth
 
-import by.sideproject.videocaster.app.rest.oauth.base.OAuth2Info
+import by.sideproject.videocaster.model.auth.oauth.OAuth2Info
 
 case class Identity (uid:String,
                      firstName: Option[String],
