@@ -36,7 +36,7 @@ class DropboxProvider(providerId: String = DropboxProvider.Dropbox) extends OAut
     val oauth2Info = JsonParser(tokenResponse.toString).convertTo[OAuth2Info]
 
     // todo request user info
-    Identity(oauth2Info.IdToken.getOrElse(""), None, None, None, None, None, Some(oauth2Info))
+    Identity(None, oauth2Info.IdToken.getOrElse(""), None, None, None, None, None, Some(oauth2Info))
   }
 
 }

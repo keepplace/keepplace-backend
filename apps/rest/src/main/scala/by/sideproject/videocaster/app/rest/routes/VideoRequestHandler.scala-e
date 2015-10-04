@@ -28,23 +28,20 @@ class VideoRequestHandler(storageService: StorageService,
 
   def route =
     pathPrefix("videos") {
-      authenticate(cookieAuth) { user =>
-        import by.sideproject.videocaster.app.rest.formaters.json.InstaVideoJsonProtocol._
-        import spray.httpx.SprayJsonSupport.sprayJsonUnmarshaller
+      import by.sideproject.videocaster.app.rest.formaters.json.InstaVideoJsonProtocol._
+      import spray.httpx.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
 
-        pathEnd {
-          get {
-            respondWithMediaType(json) {
-              complete {
-                videoDetailsDAO.findAll()
-              }
-            }
-          } ~ post {
-            entity(as[AddVideoRequest]) { addVideoRequest =>
+      respondWithMediaType(json) {
+        authenticate(cookieAuth) { user =>
+          pathEnd {
+            get {
+              complete(videoDetailsDAO.findAll())
+            } ~ post {
+              entity(as[AddVideoRequest]) { addVideoRequest =>
 
-              log.debug("Video download request: " + AddVideoRequest)
+                log.debug("Video download request: " + AddVideoRequest)
 
-              respondWithMediaType(json) {
+
                 complete {
 
                   val newId: Some[String] = Some(Math.abs(idGenerator.nextLong()).toString)
@@ -65,19 +62,14 @@ class VideoRequestHandler(storageService: StorageService,
                   }
                 }
               }
-
             }
-          }
-        } ~
-          pathPrefix(entityIdParameter) { videoId =>
+          } ~
+            pathPrefix(entityIdParameter) { videoId =>
 
-            pathEnd {
-              get {
-                respondWithMediaType(json) {
+              pathEnd {
+                get {
                   complete(videoDetailsDAO.findOneById(videoId))
-                }
-              } ~ delete {
-                respondWithMediaType(json) {
+                } ~ delete {
 
                   videoDetailsDAO.findOneById(videoId).flatMap {
                     videoDetailsDAO.removeById(videoId)
@@ -87,11 +79,10 @@ class VideoRequestHandler(storageService: StorageService,
                   complete(StatusCodes.OK)
                 }
               }
+
+
             }
-
-
-          }
-
+        }
       }
     }
 

@@ -40,7 +40,7 @@ class OAuth2Provider(providerId: String) extends IdentityProvider {
     val tokenResponse = authorizationCodeTokenRequest.execute()
     val oauth2Info = JsonParser(tokenResponse.toString).convertTo[OAuth2Info]
 
-    Identity(oauth2Info.IdToken.getOrElse(""), None, None, None, None, None, Some(oauth2Info))
+    Identity(None, oauth2Info.IdToken.getOrElse(""), None, None, None, None, None, Some(oauth2Info))
   }
 
 
