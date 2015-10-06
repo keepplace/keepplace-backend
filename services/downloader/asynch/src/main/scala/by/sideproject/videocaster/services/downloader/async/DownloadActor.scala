@@ -11,8 +11,7 @@ class DownloadActor(downloadService: DownloadService) extends Actor {
 
   override def receive: Receive = {
     case (item: VideoItemDetails, account: Identity) => {
-      println(downloadService)
-      println(item)
+      log.debug(s"Downloading video $item for $account")
       downloadService.download(item, account)
     }
     case _ => log.info("received unknown message")

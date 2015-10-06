@@ -31,7 +31,9 @@ class ApplicationKernel extends akka.kernel.Bootable {
   implicit val downloadActor : ActorRef = actorSystem.actorOf(Props(new DownloadActor(synchDownloadService)).withDispatcher("binary-download-dispatcher"))
   implicit val downloadService : DownloadService = new AsynchronousDownloadService(downloadActor, synchDownloadService)
 
-  implicit val timeout = Timeout(5.seconds)
+  implicit lazy val executionContext = actorSystem.dispatcher
+  implicit lazy val timeout = Timeout(60.seconds)
+
 
 
   override def startup(): Unit = {
