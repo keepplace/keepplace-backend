@@ -1,6 +1,6 @@
 trait AppVersions {
   val sprayJsonVer = "1.3.2"
-  val akkaVer = "2.3.13"
+  val akkaVer = "2.4.0"
   val sprayVer = "1.3.3"
   val oauthVer= "1.20.0"
   val metricsVer = "2.1.2"
