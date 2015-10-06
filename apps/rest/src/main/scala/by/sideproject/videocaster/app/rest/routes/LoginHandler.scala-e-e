@@ -29,7 +29,7 @@ class LoginHandler(storageService: StorageService, domain: String)
         authenticate(cookieAuth) { userInfo =>
           pathEnd {
             get {
-              complete(userInfo)
+              complete(userInfo.copy(oAuth2Info = None))
             }
           }
         }
