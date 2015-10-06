@@ -12,9 +12,9 @@ import scala.util.Random
 
 class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends FileStorageService {
 
-  val log = LoggerFactory.getLogger(this.getClass)
+  private val log = LoggerFactory.getLogger(this.getClass)
 
-  private val idGenerator = new Random()
+  protected val idGenerator = new Random()
 
   /**
    * 1) Takes file on filesystem.
@@ -28,7 +28,7 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
     val id: String = Math.abs(idGenerator.nextLong()).toString
     val fileName: String = new File(path).getName
 
-    val meta = new FileMeta(Some(id), fileURL(id), fileName, path)
+    val meta = new FileMeta(Some(id), fileURL(id), None, fileName, "local", path)
 
     fileMetaDao.update(meta)
 
@@ -42,11 +42,11 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
       import java.nio.file.{Files, Paths}
       val data = Files.readAllBytes(Paths.get(fileMeta.path))
 
-      FileData(fileMeta, data)
+      FileData(fileMeta, Some(data))
     }
   }
 
-  override def remove(id: String): Unit = {
+  override def remove(id: String, identity: Identity): Unit = {
     getInfo(id).map { fileForRemoval =>
       log.debug("Removing file from the file storage")
 
@@ -58,5 +58,5 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
 
   override def getInfo(id: String): Option[FileMeta] = fileMetaDao.findOneById(id)
 
-  private def fileURL(id: String) = "http://" + domain + "/data/" + id + "/download"
+  protected def fileURL(id: String) = "http://" + domain + "/data/" + id + "/download"
 }

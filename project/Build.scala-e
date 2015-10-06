@@ -21,8 +21,8 @@ object VideoPodcastDownloader extends Build {
     .dependsOn(models, fileStorageService, storageService)
 
   lazy val dropboxFileStorageService = baseProject("file-storage-dropbox", "services/filestorage/dropbox")
-    .dependsOn(models, fileStorageService, storageService)
-    .settings(libraryDependencies ++= Seq(dropbox))
+    .dependsOn(models, fileStorageService, localFileStorageService, storageService)
+    .settings(libraryDependencies ++= Seq(dropbox) ++ scalaz)
 
 
   lazy val models = baseProject("model", "model")
@@ -40,8 +40,6 @@ object VideoPodcastDownloader extends Build {
   lazy val downloaderAsynch = baseProject("downloader-asynchronous", "services/downloader/asynch")
     .dependsOn(models, youtubeDlWrapper, fileStorageService, storageService, downloader, downloaderSynch)
     .settings(libraryDependencies ++= logs ++ akka)
-  //  lazy val dropboxFileStorageService = baseProject("file-storage-dropbox", "services/filestorage/dropbox").dependsOn(models,baseFileStorageService)
-  //    .settings(libraryDependencies ++= Seq(dropbox))
 
 
   def baseProject(name: String, filePath: String) = Project(name, file(filePath)).settings(moduleSettings: _*)

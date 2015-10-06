@@ -23,7 +23,7 @@ class ApplicationKernel extends akka.kernel.Bootable {
   import by.sideproject.videocaster.app.rest.config.Config._
   implicit val actorSystem = ActorSystem("instacaster")
   implicit val metaStorageService: StorageService = InmemoryStorageService
-  implicit val binaryStorageService: FileStorageService = new DropboxFileStorageService(metaStorageService.fileMetaDAO)
+  implicit val binaryStorageService: FileStorageService = new DropboxFileStorageService(metaStorageService.fileMetaDAO, domain)
 
   implicit val youtubeDl = new YoutubeDL
 

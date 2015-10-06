@@ -76,7 +76,7 @@ class VideoRequestHandler(storageService: StorageService,
                   videoDetailsDAO.findOneById(videoId).flatMap {
                     videoDetailsDAO.removeById(videoId)
                     _.fileMetaId
-                  }.map(binaryStorageService.remove)
+                  }.map(meta => binaryStorageService.remove(meta, user))
 
                   complete(StatusCodes.OK)
                 }

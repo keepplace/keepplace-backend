@@ -4,7 +4,7 @@ import akka.actor.ActorContext
 import akka.event.Logging
 import by.sideproject.instavideo.filestorage.base.FileStorageService
 import org.slf4j.LoggerFactory
-import spray.http.HttpData
+import spray.http.{StatusCodes, HttpData}
 import spray.http.HttpHeaders.RawHeader
 
 
@@ -20,21 +20,27 @@ class DownloadRequestHandler(binaryStorageService: FileStorageService)(implicit 
       log.debug("Downloading file by id: " + binaryFileId)
       pathEnd {
         get {
-          binaryStorageService.getData(binaryFileId) match {
-            case Some(binaryData) => {
-              respondWithMediaType(mp4) {
-                respondWithHeader(RawHeader("Content-Disposition", "attachment; filename='" + binaryData.meta.name + "'")) {
-                  log.debug("Sending binary information by fileId: " + binaryData.meta)
-                  complete(HttpData(binaryData.data))
+          binaryStorageService.getData(binaryFileId).flatMap { binaryData =>
+            log.debug(s"Processing file download request for: ${binaryData.meta}")
+            binaryData.meta.placement match {
+              case "local" =>
+                binaryData.data.map { data =>
+                  respondWithMediaType(mp4) {
+                    respondWithHeader(RawHeader("Content-Disposition", s"attachment; filename='${binaryData.meta.name}'")) {
+                      log.debug(s"Sending binary information by fileId: ${binaryData.meta}")
+                      complete(HttpData(data))
+                    }
+                  }
                 }
-              }
+              case "remote" =>
+                binaryData.meta.secondaryDownloadURL.map { reditectUrl =>
+                  log.debug(s"Redirecting to actual file URL: ${binaryData.meta}")
+                  redirect(reditectUrl, StatusCodes.Found)
+                }
             }
-
-          }
+          }.getOrElse(reject())
         }
-
       }
-
     }
 
 
