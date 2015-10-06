@@ -7,8 +7,8 @@ object VideoPodcastDownloader extends Build {
   import App.Dependencies._
 
   lazy val root = baseProject("video-podcast-downloader-rest", "apps/rest")
-    .aggregate(storageService, inMemoryStorageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, localFileStorageService, fileStorageService)
-    .dependsOn(storageService, inMemoryStorageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, localFileStorageService, fileStorageService)
+    .aggregate(storageService, inMemoryStorageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, dropboxFileStorageService, fileStorageService)
+    .dependsOn(storageService, inMemoryStorageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, dropboxFileStorageService, fileStorageService)
     .settings(libraryDependencies ++= Seq(config, scalazCore, playJson) ++ spray ++ metrics ++ logs ++ akka ++ Seq(dropbox) ++ oauth)
 
 
@@ -19,6 +19,11 @@ object VideoPodcastDownloader extends Build {
 
   lazy val localFileStorageService = baseProject("file-storage-local", "services/filestorage/local")
     .dependsOn(models, fileStorageService, storageService)
+
+  lazy val dropboxFileStorageService = baseProject("file-storage-dropbox", "services/filestorage/dropbox")
+    .dependsOn(models, fileStorageService, storageService)
+    .settings(libraryDependencies ++= Seq(dropbox))
+
 
   lazy val models = baseProject("model", "model")
 

@@ -2,6 +2,7 @@ package by.sideproject.videocaster.services.downloader.sync
 
 import by.sideproject.instavideo.filestorage.base.FileStorageService
 import by.sideproject.videocaster.model.VideoItemDetails
+import by.sideproject.videocaster.model.auth.Identity
 import by.sideproject.videocaster.services.downloader.base.DownloadService
 import by.sideproject.videocaster.services.storage.base.StorageService
 import by.sideproject.videocaster.services.youtubedl.YoutubeDL
@@ -19,14 +20,14 @@ class SynchronusDownloadService(youDl: YoutubeDL, storage: StorageService, binar
     VideoItemDetails(None, Some(videoInfo.title), Some(videoInfo.description), None, url, "today", "info", Some(videoInfo.pubDate), Some(videoInfo.author))
   }
 
-  override def download(item: VideoItemDetails): Unit = {
+  override def download(item: VideoItemDetails, account: Identity): Unit = {
 
     log.debug("Starting to download video file: " + item)
     val downloadInfo = youDl.download(item.originURL)
     log.debug("Video item has been downloaded: " + downloadInfo)
 
     log.debug("Storing data in local file storage: " + downloadInfo.fileName)
-    val storedDataOption = binaryStorageService.upload(downloadInfo.fileName)
+    val storedDataOption = binaryStorageService.upload(downloadInfo.fileName, account)
 
     storedDataOption.map { storedData =>
       val updatedVideItemDetails = item.copy(

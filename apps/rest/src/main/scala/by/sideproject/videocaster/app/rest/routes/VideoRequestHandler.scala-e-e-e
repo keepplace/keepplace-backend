@@ -57,7 +57,7 @@ class VideoRequestHandler(storageService: StorageService,
                     val addedVideoItemEntry = videoDetailsDAO.findOneById(id)
 
                     log.debug("Initiating download of video file for: " + videoItemDetails)
-                    addedVideoItemEntry.map(videoItem => downloadService.download(videoItem))
+                    addedVideoItemEntry.map(videoItem => downloadService.download(videoItem, user))
 
                     addedVideoItemEntry
 

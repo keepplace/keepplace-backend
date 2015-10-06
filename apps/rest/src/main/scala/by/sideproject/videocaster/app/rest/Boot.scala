@@ -5,7 +5,7 @@ import akka.io.IO
 import akka.pattern.ask
 import akka.util.Timeout
 import by.sideproject.instavideo.filestorage.base.FileStorageService
-import by.sideproject.instavideo.filestorage.local.LocalFileStorageService
+import by.sideproject.instavideo.filestorage.dropbox.DropboxFileStorageService
 import by.sideproject.videocaster.app.rest.actors.SprayApp
 import by.sideproject.videocaster.services.downloader.async.{AsynchronousDownloadService, DownloadActor}
 import by.sideproject.videocaster.services.downloader.base.DownloadService
@@ -23,7 +23,7 @@ class ApplicationKernel extends akka.kernel.Bootable {
   import by.sideproject.videocaster.app.rest.config.Config._
   implicit val actorSystem = ActorSystem("instacaster")
   implicit val metaStorageService: StorageService = InmemoryStorageService
-  implicit val binaryStorageService: FileStorageService = new LocalFileStorageService(metaStorageService.fileMetaDAO, domain)
+  implicit val binaryStorageService: FileStorageService = new DropboxFileStorageService(metaStorageService.fileMetaDAO)
 
   implicit val youtubeDl = new YoutubeDL
 

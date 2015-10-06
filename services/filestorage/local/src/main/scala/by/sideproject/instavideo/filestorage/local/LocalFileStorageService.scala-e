@@ -3,6 +3,7 @@ package by.sideproject.instavideo.filestorage.local
 import java.io.File
 
 import by.sideproject.instavideo.filestorage.base.FileStorageService
+import by.sideproject.videocaster.model.auth.Identity
 import by.sideproject.videocaster.model.filestorage.{FileData, FileMeta}
 import by.sideproject.videocaster.services.storage.base.dao.FileMetaDAO
 import org.slf4j.LoggerFactory
@@ -22,7 +23,7 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
    * @param path - path to the file on file system.
    * @return unique identifier of the file
    */
-  override def upload(path: String): Option[FileMeta] = {
+  override def upload(path: String, account: Identity): Option[FileMeta] = {
 
     val id: String = Math.abs(idGenerator.nextLong()).toString
     val fileName: String = new File(path).getName

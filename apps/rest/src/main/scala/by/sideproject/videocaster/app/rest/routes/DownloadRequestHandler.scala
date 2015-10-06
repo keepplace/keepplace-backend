@@ -25,14 +25,10 @@ class DownloadRequestHandler(binaryStorageService: FileStorageService)(implicit 
               respondWithMediaType(mp4) {
                 respondWithHeader(RawHeader("Content-Disposition", "attachment; filename='" + binaryData.meta.name + "'")) {
                   log.debug("Sending binary information by fileId: " + binaryData.meta)
-                  complete {
-                    HttpData(binaryData.data)
-                  }
+                  complete(HttpData(binaryData.data))
                 }
               }
-
             }
-
 
           }
         }
