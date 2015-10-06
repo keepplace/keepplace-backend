@@ -4,6 +4,7 @@ import akka.actor.ActorContext
 import by.sideproject.videocaster.app.rest.oauth.dropbox.DropboxAuthService
 import by.sideproject.videocaster.services.storage.base.StorageService
 import org.slf4j.LoggerFactory
+import spray.http.StatusCodes
 
 class LoginHandler(storageService: StorageService, domain: String)
                   (implicit context: ActorContext)
@@ -35,11 +36,7 @@ class LoginHandler(storageService: StorageService, domain: String)
       }
     } ~
       path("login") {
-        (get & securedDirective) { identity =>
-          complete {
-            s"My UID is : ${identity.uid}"
-          }
-        }
+        (get & securedDirective) ( identity => redirect("/auth/profile", StatusCodes.Found))
       }
 
 }
