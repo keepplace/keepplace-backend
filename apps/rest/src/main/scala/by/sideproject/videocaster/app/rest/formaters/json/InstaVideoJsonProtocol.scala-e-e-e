@@ -10,7 +10,7 @@ import spray.json.{CollectionFormats, DefaultJsonProtocol}
 object InstaVideoJsonProtocol extends DefaultJsonProtocol with CollectionFormats {
 
 
-  implicit val podcastItemFormat = jsonFormat5(PodcastItem)
+  implicit val podcastItemFormat = jsonFormat6(PodcastItem)
   implicit val podcastChannelFormat = jsonFormat1(PodcastChannel)
 
   implicit val videoItemDetailsFormat = jsonFormat9(VideoItemDetails)

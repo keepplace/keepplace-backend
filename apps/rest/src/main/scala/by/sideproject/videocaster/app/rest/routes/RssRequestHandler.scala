@@ -40,7 +40,9 @@ class RssRequestHandler(storageService: StorageService, domain: String)
       .flatMap(item =>
       item.fileMetaId.flatMap(binaryFileId =>
         storageService.fileMetaDAO.findOneById(binaryFileId).map(fileMeta =>
-          PodcastItem(item.title.getOrElse(""),
+          PodcastItem(
+            item.id.getOrElse(""),
+            item.title.getOrElse(""),
             item.description.getOrElse(""),
             item.author.getOrElse(""),
             item.pubDate.getOrElse(""),
@@ -73,7 +75,8 @@ class RssRequestHandler(storageService: StorageService, domain: String)
       </rss>
     }
 
-  private def rssUrl = "http://" + domain + "/rss/"
+  private def rssUrl = s"http://$domain/rss/"
+  private def videoUrl(id: String) = s"http://$domain/videos/$id"
 
   private def podcastItemsMarshaller(items: Seq[PodcastItem]) =
     items.map { data =>
@@ -98,7 +101,7 @@ class RssRequestHandler(storageService: StorageService, domain: String)
           {data.downloadUrl}
         </link>
         <guid>
-          {data.downloadUrl}
+          {videoUrl(data.id)}
         </guid>
         <itunes:author>
           {data.author}
