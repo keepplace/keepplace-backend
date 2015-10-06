@@ -7,6 +7,5 @@ trait AppVersions {
   val logbackVer = "1.1.3"
   val scalazVersion = "7.1.3"
   val specs2Ver = "3.6.4"
-  val playVer = "2.4.3"
   val dropboxVer = "1.8.1"
 }

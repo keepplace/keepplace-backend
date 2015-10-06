@@ -37,8 +37,6 @@ trait AppDependencies {
     "com.typesafe.akka" %% "akka-slf4j" % akkaVer
   )
 
-  val playJson = "com.typesafe.play" %% "play-json" % playVer
-
   val nscalaTime = "com.github.nscala-time" %% "nscala-time" % "1.8.0"
 
   val oauth = Seq("com.google.oauth-client" % "google-oauth-client" % oauthVer,
