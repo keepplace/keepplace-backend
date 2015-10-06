@@ -3,6 +3,8 @@ package by.sideproject.instavideo.filestorage.dropbox
 import java.io.{File, _}
 import java.util.Locale
 
+import akka.actor.{ActorSystem, Props}
+import by.sideproject.instavideo.filestorage.dropbox.actors.FilesRemover
 import by.sideproject.instavideo.filestorage.local.LocalFileStorageService
 import by.sideproject.videocaster.model.auth.Identity
 import by.sideproject.videocaster.model.filestorage.{FileData, FileMeta}
@@ -11,13 +13,16 @@ import com.dropbox.core._
 import org.slf4j.LoggerFactory
 
 import scalaz.Scalaz._
-import scalaz._
 
-class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends LocalFileStorageService(fileMetaDao, domain) {
+class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
+                               (implicit actorSystem: ActorSystem)
+  extends LocalFileStorageService(fileMetaDao, domain) {
 
   val log = LoggerFactory.getLogger(this.getClass)
 
   val config = new DbxRequestConfig("JavaTutorial/1.0", Locale.getDefault().toString())
+
+  private val fileRemover = actorSystem.actorOf(Props[FilesRemover])
 
   /**
    * 1) Takes file on filesystem.
@@ -67,14 +72,13 @@ class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extend
       getInfo(id).map { fileForRemoval =>
         log.debug("Removing file from the file storage")
 
-        client.delete(fileForRemoval.path)
-        fileForRemoval.id.map(fileMetaDao.removeById(_))
+        fileRemover ! (client, fileForRemoval)
+
+        fileForRemoval.id.map(fileMetaDao.removeById)
 
         log.warn("TODO/ Remove file from file system")
       }
     }
-
-
   }
 
   private def withClient[T](identity: Identity)(f: (DbxClient) => Option[T]): Option[T] = {
