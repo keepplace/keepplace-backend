@@ -39,29 +39,33 @@ class VideoRequestHandler(storageService: StorageService,
             } ~ post {
               entity(as[AddVideoRequest]) { addVideoRequest =>
 
-                log.debug("Video download request: " + AddVideoRequest)
+                log.debug("Video download request: " + addVideoRequest)
+                val videoDetailsResponse = downloadService.getVideoDetails(addVideoRequest.baseUrl)
 
+                videoDetailsResponse.fold(
+                  error => complete(error),
+                  videoItemDetails => {
 
-                complete {
+                    val newId: Some[String] = Some(Math.abs(idGenerator.nextLong()).toString)
+                    val videoItemDetailsWithId = videoItemDetails.copy(id = newId)
 
-                  val newId: Some[String] = Some(Math.abs(idGenerator.nextLong()).toString)
+                    log.debug("Saving newly created video item: " + videoItemDetailsWithId)
+                    complete {
+                      videoDetailsDAO.insert(videoItemDetailsWithId).map { videoItemID =>
 
-                  val videoItemDetails: VideoItemDetails = downloadService.getVideoDetails(addVideoRequest.baseUrl).copy(id = newId)
+                        val addedVideoItemEntry = videoDetailsDAO.findOneById(videoItemID)
 
+                        log.debug("Initiating download of video file for: " + videoItemDetailsWithId)
+                        addedVideoItemEntry.map(downloadService.download(_, user))
 
-                  log.debug("Saving newly created video item: " + videoItemDetails)
-                  videoDetailsDAO.insert(
-                    videoItemDetails
-                  ).map { id =>
+                        addedVideoItemEntry
+                      }
+                    }
 
-                    val addedVideoItemEntry = videoDetailsDAO.findOneById(id)
-
-                    log.debug("Initiating download of video file for: " + videoItemDetails)
-                    addedVideoItemEntry.map(videoItem => downloadService.download(videoItem, user))
-
-                    addedVideoItemEntry
                   }
-                }
+                )
+
+
               }
             }
           } ~

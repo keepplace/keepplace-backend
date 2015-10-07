@@ -8,8 +8,8 @@ case class VideoItemDetails(id: Option[String],
                             addDate: String,
                             status: String,
                             pubDate: Option[String],
-                            author: Option[String]
-                             ) extends BaseObject {
+                            author: Option[String],
+                            note: Option[String]) extends BaseObject {
 
   def isDownloaded = "downloaded".equals(status)
 }
