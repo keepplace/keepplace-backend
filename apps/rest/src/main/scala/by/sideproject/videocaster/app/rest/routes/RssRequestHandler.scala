@@ -11,7 +11,7 @@ import scala.xml.Elem
 
 class RssRequestHandler(storageService: StorageService, domain: String)
                        (implicit context: ActorContext)
-  extends DropboxAuthService(storageService.identityDAO)
+  extends DropboxAuthService(storageService.identityDAO, storageService.profileDAO)
   with BaseService {
 
   def route =

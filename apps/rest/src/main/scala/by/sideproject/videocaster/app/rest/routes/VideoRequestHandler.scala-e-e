@@ -17,7 +17,7 @@ import scala.util.Random
 class VideoRequestHandler(storageService: StorageService,
                           downloadService: DownloadService,
                           binaryStorageService: FileStorageService)(implicit context: ActorContext)
-  extends DropboxAuthService(storageService.identityDAO)
+  extends DropboxAuthService(storageService.identityDAO, storageService.profileDAO)
   with BaseService {
 
   protected val log = LoggerFactory.getLogger(this.getClass)
@@ -60,7 +60,6 @@ class VideoRequestHandler(storageService: StorageService,
                     addedVideoItemEntry.map(videoItem => downloadService.download(videoItem, user))
 
                     addedVideoItemEntry
-
                   }
                 }
               }
@@ -81,8 +80,6 @@ class VideoRequestHandler(storageService: StorageService,
                   complete(StatusCodes.OK)
                 }
               }
-
-
             }
         }
       }

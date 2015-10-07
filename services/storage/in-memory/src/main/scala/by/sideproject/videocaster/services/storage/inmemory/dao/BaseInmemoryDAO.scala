@@ -18,7 +18,10 @@ abstract class BaseInmemoryDAO[T <: BaseObject] extends BaseDAO[T, String] {
 
   override def count(): Long = storage.size
 
-  override def update(entity: T): Unit = entity.id.map(storage.put(_, entity))
+  override def update(entity: T): Unit = {
+    log.debug(s"Updating entity by ID: $entity")
+    entity.id.map(storage.put(_, entity))
+  }
 
   override def insert(entity: T): Option[String] = {
     entity.id.map { id =>

@@ -1,8 +1,9 @@
 package by.sideproject.videocaster.app.rest.oauth.base
 
 import by.sideproject.videocaster.app.rest.oauth.base.utils.OauthConfig
-import by.sideproject.videocaster.model.auth.Identity
-import by.sideproject.videocaster.services.storage.base.dao.IdentityDAO
+import by.sideproject.videocaster.model.auth.{Profile, Identity}
+import by.sideproject.videocaster.services.storage.base.dao.{ProfileDAO, IdentityDAO}
+import com.dropbox.core.DbxClient
 import org.slf4j.LoggerFactory
 import spray.http.HttpCookie
 import spray.http.StatusCodes._
@@ -23,6 +24,8 @@ trait AuthService
 
   def identityDAO: IdentityDAO
 
+  def profileDAO: ProfileDAO
+
   implicit def fromFutureAuth[T](auth: ⇒ Future[Authentication[T]])(implicit executor: ExecutionContext): AuthMagnet[T] =
     new AuthMagnet(onSuccess(auth))
 
@@ -34,8 +37,7 @@ trait AuthService
   def cookieAuth(implicit executor: ExecutionContext): RequestContext => Future[Authentication[Identity]] = { ctx: RequestContext =>
 
     Future {
-      val cookie1: Option[HttpCookie] = sessionCookie(ctx)
-      cookie1 match {
+      sessionCookie(ctx) match {
         case Some(sessionId) =>
           identityDAO.findOneById(sessionId.content) match {
             case Some(user) => Right(user)
@@ -47,10 +49,8 @@ trait AuthService
         case None => CredentialsMissingReject
       }
     }
-
   }
 
-  //TODO : Always redirect to REDIRECT_ROUTE when there is no session
   val securedDirective: Directive1[Identity] = {
     optionalCookie(OauthConfig.SESSION_NAME).flatMap { sessionCookieId =>
       sessionCookieId match {
@@ -62,24 +62,20 @@ trait AuthService
         }
         case None => redirect(OauthConfig.REDIRECT_ROUTE, Found)
       }
-
-
     }
-
   }
 
-  def clearSession = {
-    deleteCookie(OauthConfig.SESSION_NAME)
-  }
+  def getProfile(identity: Identity): Option[Profile]
 
+  def clearSession = deleteCookie(OauthConfig.SESSION_NAME)
 
   val oauth2Routes =
     (path(OauthConfig.CALLBACK_ROUTE) & parameters('code)) { code =>
       val identity = service.requestAccessToken(code)
       val sessionId = identityDAO.getRandomSessionId
 
-
-      identityDAO.update(identity.copy(id = Some(sessionId)))
+      val profile = getProfile(identity)
+      identityDAO.update(identity.copy(id = Some(sessionId), profileId = profile.flatMap(_.id)))
 
       setCookie(HttpCookie(OauthConfig.SESSION_NAME, sessionId, path = Some("/"))) {
         redirect(OauthConfig.ON_LOGIN_GO_TO, Found)

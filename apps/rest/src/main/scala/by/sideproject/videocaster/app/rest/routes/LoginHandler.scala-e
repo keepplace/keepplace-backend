@@ -8,7 +8,7 @@ import spray.http.StatusCodes
 
 class LoginHandler(storageService: StorageService, domain: String)
                   (implicit context: ActorContext)
-  extends DropboxAuthService(storageService.identityDAO)
+  extends DropboxAuthService(storageService.identityDAO, storageService.profileDAO)
   with BaseService {
 
 
@@ -26,10 +26,11 @@ class LoginHandler(storageService: StorageService, domain: String)
 
       respondWithMediaType(json) {
 
-        authenticate(cookieAuth) { userInfo =>
+        authenticate(cookieAuth) { identity =>
           pathEnd {
             get {
-              complete(userInfo.copy(oAuth2Info = None))
+              val profile = identity.profileId.map(storageService.profileDAO.findOneById(_))
+              complete(profile)
             }
           }
         }

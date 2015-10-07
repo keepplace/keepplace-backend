@@ -1,9 +1,13 @@
 package by.sideproject.videocaster.services.storage.base.dao
 
+import java.util.UUID
+
 import by.sideproject.videocaster.model.BaseObject
 import by.sideproject.videocaster.model.util.{Page, PageParameter}
 
 trait BaseDAO[T <: BaseObject, ID] {
+
+  def getNewId: String = UUID.randomUUID().toString
 
   def findOneById(id: ID): Option[T]
 
