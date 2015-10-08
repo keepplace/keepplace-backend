@@ -14,8 +14,6 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  protected val idGenerator = new Random()
-
   /**
    * 1) Takes file on filesystem.
    * 2) Stores it in internal storage.
@@ -25,7 +23,7 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
    */
   override def upload(path: String, account: Identity): Option[FileMeta] = {
 
-    val id: String = Math.abs(idGenerator.nextLong()).toString
+    val id = fileMetaDao.getNewId
     val fileName: String = new File(path).getName
 
     val meta = new FileMeta(Some(id), fileURL(id), None, fileName, "local", path)
@@ -35,7 +33,7 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
     Some(meta)
   }
 
-  override def getData(id: String): Option[FileData] = {
+  override def getData(id: Long): Option[FileData] = {
     fileMetaDao.findOneById(id).map { fileMeta =>
       log.debug("Reading data: " + fileMeta)
 
@@ -46,7 +44,7 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
     }
   }
 
-  override def remove(id: String, identity: Identity): Unit = {
+  override def remove(id: Long, identity: Identity): Unit = {
     getInfo(id).map { fileForRemoval =>
       log.debug("Removing file from the file storage")
 
@@ -56,7 +54,7 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
     }
   }
 
-  override def getInfo(id: String): Option[FileMeta] = fileMetaDao.findOneById(id)
+  override def getInfo(id: Long): Option[FileMeta] = fileMetaDao.findOneById(id)
 
-  protected def fileURL(id: String) = "http://" + domain + "/data/" + id + "/download"
+  protected def fileURL(id: Long) = "http://" + domain + "/data/" + id + "/download"
 }

@@ -41,7 +41,7 @@ class RssRequestHandler(storageService: StorageService, domain: String)
       item.fileMetaId.flatMap(binaryFileId =>
         storageService.fileMetaDAO.findOneById(binaryFileId).map(fileMeta =>
           PodcastItem(
-            item.id.getOrElse(""),
+            item.id.getOrElse(-1),
             item.title.getOrElse(""),
             item.description.getOrElse(""),
             item.author.getOrElse(""),
@@ -76,7 +76,7 @@ class RssRequestHandler(storageService: StorageService, domain: String)
     }
 
   private def rssUrl = s"http://$domain/rss/"
-  private def videoUrl(id: String) = s"http://$domain/videos/$id"
+  private def videoUrl(id: Long) = s"http://$domain/videos/$id"
 
   private def podcastItemsMarshaller(items: Seq[PodcastItem]) =
     items.map { data =>

@@ -1,5 +1,7 @@
 package by.sideproject.videocaster.app.rest.oauth.dropbox
 
+import java.util.UUID
+
 import by.sideproject.videocaster.app.rest.formaters.json.DropboxJsonProtocol
 import by.sideproject.videocaster.app.rest.oauth.base.OAuth2Provider
 import by.sideproject.videocaster.app.rest.oauth.base.utils.OauthConfig
@@ -35,7 +37,8 @@ class DropboxProvider(providerId: String = DropboxProvider.Dropbox) extends OAut
     val tokenResponse = authorizationCodeTokenRequest.execute()
     val oauth2Info = JsonParser(tokenResponse.toString).convertTo[OAuth2Info]
 
-    Identity(None, oauth2Info.IdToken.getOrElse(""), None, None, None, None, None, None, Some(oauth2Info))
+    val sessionId = UUID.randomUUID().toString
+    Identity(None, oauth2Info.IdToken.getOrElse(""), sessionId, None, None, None, None, None, None, Some(oauth2Info))
   }
 
 }

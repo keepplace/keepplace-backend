@@ -5,4 +5,8 @@ import by.sideproject.videocaster.services.storage.base.dao.IdentityDAO
 
 class InmemoryIdentityDAO
   extends BaseInmemoryDAO[Identity]
-  with IdentityDAO
+  with IdentityDAO {
+  override def findBySessionId(sessionId: String): Option[Identity] = {
+    storage.values.find(_.sessionId == sessionId)
+  }
+}

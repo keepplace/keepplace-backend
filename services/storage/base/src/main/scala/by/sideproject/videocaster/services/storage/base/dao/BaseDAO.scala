@@ -5,9 +5,14 @@ import java.util.UUID
 import by.sideproject.videocaster.model.BaseObject
 import by.sideproject.videocaster.model.util.{Page, PageParameter}
 
-trait BaseDAO[T <: BaseObject, ID] {
+import scala.util.Random
 
-  def getNewId: String = UUID.randomUUID().toString
+trait BaseDAO[T <: BaseObject[ID], ID] {
+
+
+  val random: Random = new Random()
+  def getNewId: Long = Math.abs(random.nextLong())
+
 
   def findOneById(id: ID): Option[T]
 

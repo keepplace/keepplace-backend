@@ -1,5 +1,7 @@
 package by.sideproject.videocaster.app.rest.oauth.base
 
+import java.util.UUID
+
 import by.sideproject.videocaster.app.rest.oauth.base.utils.OauthConfig
 import by.sideproject.videocaster.model.auth.{Profile, Identity}
 import by.sideproject.videocaster.services.storage.base.dao.{ProfileDAO, IdentityDAO}
@@ -39,7 +41,7 @@ trait AuthService
     Future {
       sessionCookie(ctx) match {
         case Some(sessionId) =>
-          identityDAO.findOneById(sessionId.content) match {
+          identityDAO.findBySessionId(sessionId.content) match {
             case Some(user) => Right(user)
             case _ => {
               clearSession
@@ -55,7 +57,7 @@ trait AuthService
     optionalCookie(OauthConfig.SESSION_NAME).flatMap { sessionCookieId =>
       sessionCookieId match {
         case Some(cookie) => {
-          identityDAO.findOneById(cookie.content) match {
+          identityDAO.findBySessionId(cookie.content) match {
             case Some(session) => provide(session)
             case _ => redirect(OauthConfig.REDIRECT_ROUTE, Found)
           }
@@ -71,13 +73,14 @@ trait AuthService
 
   val oauth2Routes =
     (path(OauthConfig.CALLBACK_ROUTE) & parameters('code)) { code =>
+      val identityId = identityDAO.getRandomSessionId
+
       val identity = service.requestAccessToken(code)
-      val sessionId = identityDAO.getRandomSessionId
 
       val profile = getProfile(identity)
-      identityDAO.update(identity.copy(id = Some(sessionId), profileId = profile.flatMap(_.id)))
+      identityDAO.update(identity.copy(id = Some(identityId), profileId = profile.flatMap(_.id)))
 
-      setCookie(HttpCookie(OauthConfig.SESSION_NAME, sessionId, path = Some("/"))) {
+      setCookie(HttpCookie(OauthConfig.SESSION_NAME, identity.sessionId, path = Some("/"))) {
         redirect(OauthConfig.ON_LOGIN_GO_TO, Found)
       }
     } ~
