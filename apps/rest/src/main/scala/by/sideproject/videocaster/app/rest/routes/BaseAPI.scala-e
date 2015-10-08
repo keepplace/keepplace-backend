@@ -4,7 +4,7 @@ import spray.http.MediaType
 import spray.http.MediaTypes._
 import spray.routing._
 
-trait BaseService extends HttpService {
+trait BaseAPI extends HttpService {
 
   val json: MediaType = `application/json`
   val text: MediaType = `text/plain`

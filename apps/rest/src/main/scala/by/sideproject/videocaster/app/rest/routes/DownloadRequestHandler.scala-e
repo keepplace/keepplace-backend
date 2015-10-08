@@ -8,7 +8,7 @@ import spray.http.{StatusCodes, HttpData}
 import spray.http.HttpHeaders.RawHeader
 
 
-class DownloadRequestHandler(binaryStorageService: FileStorageService)(implicit context: ActorContext) extends BaseService {
+class DownloadRequestHandler(binaryStorageService: FileStorageService)(implicit context: ActorContext) extends BaseAPI {
 
   val log = LoggerFactory.getLogger(this.getClass)
 

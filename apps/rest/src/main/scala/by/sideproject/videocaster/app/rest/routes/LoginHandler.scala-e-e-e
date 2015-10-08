@@ -9,7 +9,7 @@ import spray.http.StatusCodes
 class LoginHandler(storageService: StorageService, domain: String)
                   (implicit context: ActorContext)
   extends DropboxAuthService(storageService.identityDAO, storageService.profileDAO)
-  with BaseService {
+  with BaseAPI {
 
 
   protected val log = LoggerFactory.getLogger(this.getClass)
