@@ -43,7 +43,7 @@ class VideoAPI(storageService: StorageService,
               }
             }
         } ~
-          pathPrefix(LongNumber) {
+          pathPrefix(IntNumber) {
             entityId => {
               pathEnd {
                 get {

@@ -10,7 +10,7 @@ trait BaseAPI extends HttpService {
   val text: MediaType = `text/plain`
   val mp4: MediaType = `video/mp4`
   val xml: MediaType = `application/xml`
-  val entityIdParameter = LongNumber
+  val entityIdParameter = IntNumberR
 
   def route: Route
 

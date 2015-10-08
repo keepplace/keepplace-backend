@@ -33,7 +33,7 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
     Some(meta)
   }
 
-  override def getData(id: Long): Option[FileData] = {
+  override def getData(id: Int): Option[FileData] = {
     fileMetaDao.findOneById(id).map { fileMeta =>
       log.debug("Reading data: " + fileMeta)
 
@@ -44,7 +44,7 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
     }
   }
 
-  override def remove(id: Long, identity: Identity): Unit = {
+  override def remove(id: Int, identity: Identity): Unit = {
     getInfo(id).map { fileForRemoval =>
       log.debug("Removing file from the file storage")
 
@@ -54,7 +54,7 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
     }
   }
 
-  override def getInfo(id: Long): Option[FileMeta] = fileMetaDao.findOneById(id)
+  override def getInfo(id: Int): Option[FileMeta] = fileMetaDao.findOneById(id)
 
-  protected def fileURL(id: Long) = "http://" + domain + "/data/" + id + "/download"
+  protected def fileURL(id: Int) = "http://" + domain + "/data/" + id + "/download"
 }

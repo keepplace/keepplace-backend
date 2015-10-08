@@ -23,7 +23,7 @@ class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: Do
         error => ctx.complete(error),
         videoItemDetails => {
 
-          val newId: Some[Long] = Some(videoDetailsDAO.getNewId)
+          val newId: Some[Int] = Some(videoDetailsDAO.getNewId)
           val videoItemDetailsWithId = videoItemDetails.copy(id = newId)
 
           log.debug("Saving newly created video item: " + videoItemDetailsWithId)

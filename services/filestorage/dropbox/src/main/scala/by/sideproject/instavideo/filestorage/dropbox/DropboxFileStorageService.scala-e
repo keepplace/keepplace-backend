@@ -63,11 +63,11 @@ class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
 
   }
 
-  override def getData(id: Long): Option[FileData] = {
+  override def getData(id: Int): Option[FileData] = {
     fileMetaDao.findOneById(id).map(FileData(_, None))
   }
 
-  override def remove(id: Long, identity: Identity): Unit = {
+  override def remove(id: Int, identity: Identity): Unit = {
     withClient(identity) { client =>
       getInfo(id).map { fileForRemoval =>
         log.debug("Removing file from the file storage")

@@ -11,7 +11,7 @@ trait BaseDAO[T <: BaseObject[ID], ID] {
 
 
   val random: Random = new Random()
-  def getNewId: Long = Math.abs(random.nextLong())
+  def getNewId: Int = Math.abs(random.nextInt())
 
 
   def findOneById(id: ID): Option[T]
@@ -26,7 +26,7 @@ trait BaseDAO[T <: BaseObject[ID], ID] {
 
   def find(pageParameter: PageParameter): Page[T]
 
-  def count(): Long
+  def count(): Int
 
   def removeById(id: ID): Unit
 

@@ -3,7 +3,7 @@ package by.sideproject.videocaster.model.auth
 import by.sideproject.videocaster.model.BaseObject
 import by.sideproject.videocaster.model.auth.oauth.OAuth2Info
 
-case class Identity(id: Option[Long],
+case class Identity(id: Option[Int],
                     uid: String,
                     sessionId: String,
                     firstName: Option[String],
@@ -11,5 +11,5 @@ case class Identity(id: Option[Long],
                     fullName: Option[String],
                     email: Option[String],
                     avatarUrl: Option[String],
-                    profileId: Option[Long],
-                    oAuth2Info: Option[OAuth2Info] = None) extends BaseObject[Long]
+                    profileId: Option[Int],
+                    oAuth2Info: Option[OAuth2Info] = None) extends BaseObject[Int]

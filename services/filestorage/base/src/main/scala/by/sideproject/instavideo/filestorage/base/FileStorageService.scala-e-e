@@ -13,10 +13,10 @@ trait FileStorageService {
    */
   def upload(path: String, account: Identity): Option[FileMeta]
 
-  def remove(id: Long, identity: Identity): Unit
+  def remove(id: Int, identity: Identity): Unit
 
-  def getInfo(id: Long): Option[FileMeta]
+  def getInfo(id: Int): Option[FileMeta]
 
-  def getData(id: Long): Option[FileData]
+  def getData(id: Int): Option[FileData]
 
 }
