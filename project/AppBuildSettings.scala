@@ -6,7 +6,7 @@ trait AppBuildSettings {
   import App.Resolvers._
 
   Keys.fork in Test := false
-  val buildOrganization = "by.sideproject.videcaster"
+  val buildOrganization = "keep.place"
   val buildScalaVersion = "2.11.7"
   val jdkVersion = settingKey[String]("")
 
