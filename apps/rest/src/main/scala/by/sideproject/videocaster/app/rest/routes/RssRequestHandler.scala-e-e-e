@@ -7,6 +7,7 @@ import by.sideproject.videocaster.services.storage.base.StorageService
 import spray.http._
 import spray.httpx.marshalling.Marshaller
 
+import scala.concurrent.Future
 import scala.xml.Elem
 
 class RssRequestHandler(storageService: StorageService, domain: String)
@@ -23,7 +24,7 @@ class RssRequestHandler(storageService: StorageService, domain: String)
           get {
             respondWithMediaType(xml) {
               complete {
-                PodcastChannel(getPodcastItems)
+                getPodcastItems.map(PodcastChannel(_))
               }
             }
           }
@@ -32,24 +33,28 @@ class RssRequestHandler(storageService: StorageService, domain: String)
     }
 
 
-  private def getPodcastItems: Vector[PodcastItem] = {
-    storageService
-      .videoItemDetailsDAO
-      .findAll()
-      .filter(_.isDownloaded)
-      .flatMap(item =>
-      item.fileMetaId.flatMap(binaryFileId =>
-        storageService.fileMetaDAO.findOneById(binaryFileId).map(fileMeta =>
-          PodcastItem(
-            item.id.getOrElse(-1),
-            item.title.getOrElse(""),
-            item.description.getOrElse(""),
-            item.author.getOrElse(""),
-            item.pubDate.getOrElse(""),
-            fileMeta.downloadURL)
+  private def getPodcastItems: Future[Seq[PodcastItem]] = {
+
+    for {
+      videoItems <- storageService.videoItemDetailsDAO.findAll()
+    } yield {
+      videoItems.filter(_.isDownloaded)
+        .flatMap(item =>
+          item.fileMetaId.flatMap(binaryFileId =>
+            storageService.fileMetaDAO.findOneById(binaryFileId).map(fileMeta =>
+              PodcastItem(
+                item.id.getOrElse(-1),
+                item.title.getOrElse(""),
+                item.description.getOrElse(""),
+                item.author.getOrElse(""),
+                item.pubDate.getOrElse(""),
+                fileMeta.downloadURL)
+            )
+          )
         )
-      )
-      )
+    }
+
+
   }
 
   private def podcastChannelMarshaller(contentType: ContentType, more: ContentType*): Marshaller[PodcastChannel] =
@@ -76,6 +81,7 @@ class RssRequestHandler(storageService: StorageService, domain: String)
     }
 
   private def rssUrl = s"http://$domain/rss/"
+
   private def videoUrl(id: Int) = s"http://$domain/videos/$id"
 
   private def podcastItemsMarshaller(items: Seq[PodcastItem]) =

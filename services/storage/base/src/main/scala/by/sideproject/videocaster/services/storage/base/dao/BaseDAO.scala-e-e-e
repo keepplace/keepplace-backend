@@ -2,12 +2,14 @@ package by.sideproject.videocaster.services.storage.base.dao
 
 import by.sideproject.videocaster.model.BaseObject
 
+import scala.concurrent.Future
 import scala.util.Random
 
 trait BaseDAO[T <: BaseObject[ID], ID] {
 
 
   val random: Random = new Random()
+
   def getNewId: Int = Math.abs(random.nextInt())
 
 
@@ -17,7 +19,7 @@ trait BaseDAO[T <: BaseObject[ID], ID] {
 
   def update(entity: T): Unit
 
-  def findAll(): Vector[T]
+  def findAll(): Future[Seq[T]]
 
   def removeById(id: ID): Unit
 
