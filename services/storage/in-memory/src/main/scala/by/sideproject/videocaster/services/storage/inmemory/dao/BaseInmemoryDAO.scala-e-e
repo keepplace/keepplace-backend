@@ -1,7 +1,6 @@
 package by.sideproject.videocaster.services.storage.inmemory.dao
 
 import by.sideproject.videocaster.model.BaseObject
-import by.sideproject.videocaster.model.util.{Page, PageParameter}
 import by.sideproject.videocaster.services.storage.base.dao.BaseDAO
 import org.slf4j.LoggerFactory
 
