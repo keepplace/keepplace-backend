@@ -99,8 +99,6 @@ trait AppDependencies {
   def tests(allDependencies: Seq[ModuleID]): Seq[ModuleID] =
     specs2Tests ++ allDependencies
 
-  /*.map(_.excludeAll(ExclusionRule(organization = "org.specs2")))*/
-
   def withSources(allDependencies: Seq[ModuleID]): Seq[ModuleID] = {
     val (withoutSourcesDeps, withSourcesDeps) = allDependencies.partition(_.name.contains("mysql"))
     withSourcesDeps.map(_ withSources() withJavadoc()) ++ withoutSourcesDeps
