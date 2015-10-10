@@ -6,12 +6,16 @@ import by.sideproject.videocaster.services.downloader.base.DownloadService
 import by.sideproject.videocaster.services.storage.base.dao.VideoItemDetailsDAO
 import org.slf4j.LoggerFactory
 
+import scala.concurrent.ExecutionContext
+
 class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: DownloadService) extends Actor {
 
   import by.sideproject.videocaster.app.rest.formaters.json.InstaVideoJsonProtocol._
   import spray.httpx.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
 
   val log = LoggerFactory.getLogger(this.getClass)
+
+  private implicit val ex: ExecutionContext = context.dispatcher
 
   override def receive = {
     case VideosAddRequest(ctx, request, user) => {
@@ -28,9 +32,9 @@ class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: Do
 
           log.debug("Saving newly created video item: " + videoItemDetailsWithId)
 
-
-          videoDetailsDAO.insert(videoItemDetailsWithId).map { videoItemID =>
-
+          for {
+            videoItemID <- videoDetailsDAO.insert(videoItemDetailsWithId)
+          } yield {
             val addedVideoItemEntry = videoDetailsDAO.findOneById(videoItemID)
             log.debug("Initiating download of video file for: " + videoItemDetailsWithId)
             addedVideoItemEntry.map(downloadService.download(_, user))

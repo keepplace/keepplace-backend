@@ -15,7 +15,7 @@ trait BaseDAO[T <: BaseObject[ID], ID] {
 
   def findOneById(id: ID): Option[T]
 
-  def insert(entity: T): Option[ID]
+  def insert(entity: T): Future[ID]
 
   def update(entity: T): Unit
 

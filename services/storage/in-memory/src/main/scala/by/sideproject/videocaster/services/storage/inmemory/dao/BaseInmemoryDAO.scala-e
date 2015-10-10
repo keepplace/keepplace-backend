@@ -9,6 +9,7 @@ import scala.collection.mutable.Map
 import scala.concurrent.{ExecutionContext, Future}
 
 abstract class BaseInmemoryDAO[T <: BaseObject[Int]] extends BaseDAO[T, Int] {
+
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private val log = LoggerFactory.getLogger(this.getClass)
@@ -23,13 +24,17 @@ abstract class BaseInmemoryDAO[T <: BaseObject[Int]] extends BaseDAO[T, Int] {
     entity.id.map(storage.put(_, entity))
   }
 
-  override def insert(entity: T): Option[Int] = {
-    entity.id.map { id =>
-      storage.put(id, entity)
-      log.debug("Inserting item to storage: " + id + " / " + entity)
-      id
+  override def insert(entity: T): Future[Int] = {
+
+    Future {
+      entity.id.map(id => {
+        storage.put(id, entity)
+        id
+      }).get
     }
+
   }
+
 
   override def findAll(): Future[Seq[T]] = Future(storage.values.toSeq)
 
