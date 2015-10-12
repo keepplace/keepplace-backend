@@ -8,7 +8,7 @@ import scala.collection.mutable
 import scala.collection.mutable.Map
 import scala.concurrent.Future
 
-abstract class BaseInmemoryDAO[T <: BaseObject[Int]] extends BaseDAO[T, Int] {
+abstract class InmemoryBaseDAO[T <: BaseObject[Int]] extends BaseDAO[T, Int] {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 

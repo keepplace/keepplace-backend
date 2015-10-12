@@ -4,5 +4,5 @@ import by.sideproject.videocaster.model.VideoItemDetails
 import by.sideproject.videocaster.services.storage.base.dao.VideoItemDetailsDAO
 
 class InmemoryVideoItemDetailsDAO
-  extends BaseInmemoryDAO[VideoItemDetails]
+  extends InmemoryBaseDAO[VideoItemDetails]
   with VideoItemDetailsDAO
