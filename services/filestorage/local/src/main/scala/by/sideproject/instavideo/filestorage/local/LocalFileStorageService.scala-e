@@ -8,9 +8,10 @@ import by.sideproject.videocaster.model.filestorage.{FileData, FileMeta}
 import by.sideproject.videocaster.services.storage.base.dao.FileMetaDAO
 import org.slf4j.LoggerFactory
 
-import scala.util.Random
+import scala.concurrent.{ExecutionContext, Future}
 
-class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends FileStorageService {
+
+class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String)(implicit executionContext: ExecutionContext) extends FileStorageService {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -21,40 +22,50 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String) extends 
    * @param path - path to the file on file system.
    * @return unique identifier of the file
    */
-  override def upload(path: String, account: Identity): Option[FileMeta] = {
+  override def upload(path: String, account: Identity): Future[Option[FileMeta]] = {
 
     val id = fileMetaDao.getNewId
     val fileName: String = new File(path).getName
 
     val meta = new FileMeta(Some(id), fileURL(id), None, fileName, "local", path)
 
-    fileMetaDao.update(meta)
+    for {
+      insertedFileMetaId <- fileMetaDao.insert(meta)
+    } yield {
+      Some(meta)
+    }
 
-    Some(meta)
   }
 
-  override def getData(id: Int): Option[FileData] = {
-    fileMetaDao.findOneById(id).map { fileMeta =>
-      log.debug("Reading data: " + fileMeta)
+  override def getData(id: Int): Future[Option[FileData]] = {
 
-      import java.nio.file.{Files, Paths}
-      val data = Files.readAllBytes(Paths.get(fileMeta.path))
-
-      FileData(fileMeta, Some(data))
+    import java.nio.file.{Files, Paths}
+    log.debug(s"Fetching data for FileID: $id")
+    for {
+      fileMetaOption <- fileMetaDao.findOneById(id)
+    } yield {
+      fileMetaOption.map { fileMeta =>
+        val data = Files.readAllBytes(Paths.get(fileMeta.path))
+        FileData(fileMeta, Some(data))
+      }
     }
   }
 
   override def remove(id: Int, identity: Identity): Unit = {
-    getInfo(id).map { fileForRemoval =>
-      log.debug("Removing file from the file storage")
+    for {
+      fileInfoOption <- getInfo(id)
+    } yield {
+      fileInfoOption.map { fileForRemoval =>
+        log.debug("Removing file from the file storage")
 
-      fileForRemoval.id.map(fileMetaDao.removeById(_))
+        fileForRemoval.id.map(fileMetaDao.removeById(_))
 
-      log.warn("TODO/ Remove file from file system")
+        log.warn("TODO/ Remove file from file system")
+      }
     }
   }
 
-  override def getInfo(id: Int): Option[FileMeta] = fileMetaDao.findOneById(id)
+  override def getInfo(id: Int): Future[Option[FileMeta]] = fileMetaDao.findOneById(id)
 
   protected def fileURL(id: Int) = "http://" + domain + "/data/" + id + "/download"
 }

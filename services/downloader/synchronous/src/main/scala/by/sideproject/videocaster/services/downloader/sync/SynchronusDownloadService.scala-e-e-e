@@ -10,8 +10,11 @@ import by.sideproject.videocaster.services.storage.base.StorageService
 import by.sideproject.videocaster.services.youtubedl.YoutubeDL
 import org.slf4j.LoggerFactory
 
+import scala.concurrent.ExecutionContext
+
 
 class SynchronusDownloadService(youDl: YoutubeDL, storage: StorageService, binaryStorageService: FileStorageService)
+                               (implicit executionContext: ExecutionContext)
   extends DownloadService {
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -36,10 +39,10 @@ class SynchronusDownloadService(youDl: YoutubeDL, storage: StorageService, binar
     downloadInfoResult match {
       case Right(downloadInfo) => {
         log.debug("Storing data in local file storage: " + downloadInfo.fileName)
-        val storedDataOption = binaryStorageService.upload(downloadInfo.fileName, account)
-
-        storedDataOption.map {
-          storedData =>
+        for {
+          storedDataOption <- binaryStorageService.upload(downloadInfo.fileName, account)
+        } yield {
+          storedDataOption.map { storedData =>
             val updatedVideItemDetails = item.copy(
               title = Some(downloadInfo.title),
               description = Some(downloadInfo.description),
@@ -51,6 +54,7 @@ class SynchronusDownloadService(youDl: YoutubeDL, storage: StorageService, binar
             log.debug("Updating an information about video file: " + updatedVideItemDetails)
 
             storage.videoItemDetailsDAO.update(updatedVideItemDetails)
+          }
         }
       }
       case Left(error) => {

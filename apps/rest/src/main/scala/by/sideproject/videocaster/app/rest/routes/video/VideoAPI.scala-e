@@ -4,7 +4,8 @@ import akka.actor.{ActorContext, Props}
 import akka.util.Timeout
 import by.sideproject.instavideo.filestorage.base.FileStorageService
 import by.sideproject.videocaster.app.rest.oauth.dropbox.DropboxAuthService
-import by.sideproject.videocaster.app.rest.routes.BaseAPI
+import by.sideproject.videocaster.app.rest.routes.base.BaseAPI
+import by.sideproject.videocaster.app.rest.routes.base.requests.EntityRequest
 import by.sideproject.videocaster.app.rest.routes.video.handlers._
 import by.sideproject.videocaster.app.rest.routes.video.requests._
 import by.sideproject.videocaster.model.video.AddVideoRequest
@@ -47,9 +48,9 @@ class VideoAPI(storageService: StorageService,
             entityId => {
               pathEnd {
                 get {
-                  ctx => videosGetEntityHandler ! VideosEntityRequest(ctx, entityId, identity)
+                  ctx => videosGetEntityHandler ! EntityRequest(ctx, entityId, identity)
                 } ~ delete {
-                  ctx => videosDeleteEntityHandler ! VideosEntityRequest(ctx, entityId, identity)
+                  ctx => videosDeleteEntityHandler ! EntityRequest(ctx, entityId, identity)
                 }
               }
             }

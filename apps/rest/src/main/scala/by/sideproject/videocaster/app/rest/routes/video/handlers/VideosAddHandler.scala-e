@@ -8,14 +8,13 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
 
-class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: DownloadService) extends Actor {
+class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: DownloadService)
+                      (implicit executionContext: ExecutionContext) extends Actor {
 
   import by.sideproject.videocaster.app.rest.formaters.json.InstaVideoJsonProtocol._
   import spray.httpx.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
 
   val log = LoggerFactory.getLogger(this.getClass)
-
-  private implicit val ex: ExecutionContext = context.dispatcher
 
   override def receive = {
     case VideosAddRequest(ctx, request, user) => {
@@ -34,8 +33,8 @@ class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: Do
 
           for {
             videoItemID <- videoDetailsDAO.insert(videoItemDetailsWithId)
+            addedVideoItemEntry <- videoDetailsDAO.findOneById(videoItemID)
           } yield {
-            val addedVideoItemEntry = videoDetailsDAO.findOneById(videoItemID)
             log.debug("Initiating download of video file for: " + videoItemDetailsWithId)
             addedVideoItemEntry.map(downloadService.download(_, user))
 

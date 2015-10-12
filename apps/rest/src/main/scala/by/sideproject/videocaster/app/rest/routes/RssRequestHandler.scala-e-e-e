@@ -2,18 +2,27 @@ package by.sideproject.videocaster.app.rest.routes
 
 import akka.actor.ActorContext
 import by.sideproject.videocaster.app.rest.oauth.dropbox.DropboxAuthService
+import by.sideproject.videocaster.app.rest.routes.base.BaseAPI
+import by.sideproject.videocaster.model.VideoItemDetails
+import by.sideproject.videocaster.model.filestorage.FileMeta
 import by.sideproject.videocaster.model.rss.{PodcastChannel, PodcastItem}
 import by.sideproject.videocaster.services.storage.base.StorageService
+import shapeless.Tuple
 import spray.http._
 import spray.httpx.marshalling.Marshaller
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Try, Success, Failure}
 import scala.xml.Elem
+import scalaz.OptionT
 
 class RssRequestHandler(storageService: StorageService, domain: String)
                        (implicit context: ActorContext)
   extends DropboxAuthService(storageService.identityDAO, storageService.profileDAO)
   with BaseAPI {
+
+  private val fileMetaDAO = storageService.fileMetaDAO
+
 
   def route =
 
@@ -37,24 +46,44 @@ class RssRequestHandler(storageService: StorageService, domain: String)
 
     for {
       videoItems <- storageService.videoItemDetailsDAO.findAll()
+      filteredVideoItems = videoItems.filter(_.isDownloaded)
+
+      videoItemWithDefinedFileMeta = filteredVideoItems
+        .map(videoItem => (videoItem, videoItem.fileMetaId))
+        .flatMap { case (videoItemDetail: VideoItemDetails, fileMetaIdOption: Option[Int]) =>
+          fileMetaIdOption.map((videoItemDetail, _))
+        }
+
+      videoItemsWithFileMetaFutureOptions = videoItemWithDefinedFileMeta.map {
+        case (item: VideoItemDetails, fileMetaId: Int) => (item, fileMetaDAO.findOneById(fileMetaId))
+      }.map { case (item: VideoItemDetails, metaOptionFuture: Future[Option[FileMeta]]) =>
+        // all options with defined value
+
+        metaOptionFuture.map {
+          case Some(meta) => Success(buildPodcastItem(item, meta))
+          case None => Failure
+        }.collect { case Success(s: PodcastItem) => s }
+
+      }
+
+      podcastItems <- Future.sequence(videoItemsWithFileMetaFutureOptions)
+
     } yield {
-      videoItems.filter(_.isDownloaded)
-        .flatMap(item =>
-          item.fileMetaId.flatMap(binaryFileId =>
-            storageService.fileMetaDAO.findOneById(binaryFileId).map(fileMeta =>
-              PodcastItem(
-                item.id.getOrElse(-1),
-                item.title.getOrElse(""),
-                item.description.getOrElse(""),
-                item.author.getOrElse(""),
-                item.pubDate.getOrElse(""),
-                fileMeta.downloadURL)
-            )
-          )
-        )
+
+      podcastItems
     }
 
 
+  }
+
+  private def buildPodcastItem(item: VideoItemDetails, meta: FileMeta): PodcastItem = {
+    PodcastItem(
+      item.id.getOrElse(-1),
+      item.title.getOrElse(""),
+      item.description.getOrElse(""),
+      item.author.getOrElse(""),
+      item.pubDate.getOrElse(""),
+      meta.downloadURL)
   }
 
   private def podcastChannelMarshaller(contentType: ContentType, more: ContentType*): Marshaller[PodcastChannel] =

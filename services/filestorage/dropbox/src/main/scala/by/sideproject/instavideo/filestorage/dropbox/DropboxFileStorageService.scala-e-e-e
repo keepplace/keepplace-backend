@@ -12,10 +12,11 @@ import by.sideproject.videocaster.services.storage.base.dao.FileMetaDAO
 import com.dropbox.core._
 import org.slf4j.LoggerFactory
 
+import scala.concurrent.{ExecutionContext, Future}
 import scalaz.Scalaz._
 
 class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
-                               (implicit actorSystem: ActorSystem)
+                               (implicit actorSystem: ActorSystem, executionContext: ExecutionContext)
   extends LocalFileStorageService(fileMetaDao, domain) {
 
   val log = LoggerFactory.getLogger(this.getClass)
@@ -31,53 +32,60 @@ class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
    * @param path - path to the file on file system.
    * @return unique identifier of the file
    */
-  override def upload(path: String, identity: Identity): Option[FileMeta] = {
+  override def upload(path: String, identity: Identity): Future[Option[FileMeta]] = {
     log.debug("Storing file to Dropbox account: " + path + " " + identity)
 
-    withClient(identity) { client =>
-      log.debug("With client for: " + client.getAccountInfo)
 
-      val inputFile = new File(path)
-      val inputStream = new FileInputStream(inputFile)
+    val inputFile = new File(path)
+    val inputStream = new FileInputStream(inputFile)
+    val filePath = s"/${inputFile.getName}"
 
-      val filePath = s"/${inputFile.getName}"
+    Future {
+      withClient(identity) { client =>
+        log.debug("With client for: " + client.getAccountInfo)
 
-      val uploadedFile = client.uploadFile(filePath, DbxWriteMode.add(), inputFile.length(), inputStream)
-      log.debug("Uploaded: " + uploadedFile.toString())
+        val uploadedFile = client.uploadFile(filePath, DbxWriteMode.add(), inputFile.length(), inputStream)
+        log.debug("Uploaded: " + uploadedFile.toString())
 
-      val uploadedFilePath = uploadedFile.path
+        val uploadedFilePath = uploadedFile.path
 
-      val sharableUrl: String = client.createShareableUrl(uploadedFilePath)
-      val id = fileMetaDao.getNewId
 
-      val meta = new FileMeta(Some(id), fileURL(id), Some(sharableUrl.replace("dl=0", "dl=1")), inputFile.getName, "remote", uploadedFilePath)
-      fileMetaDao.update(meta)
+        val sharableUrl: String = client.createShareableUrl(uploadedFilePath)
+        val id = fileMetaDao.getNewId
 
-      inputStream.close()
-      //      TODO remove files in future
-      //      inputFile.delete()
+        val meta = new FileMeta(Some(id), fileURL(id), Some(sharableUrl.replace("dl=0", "dl=1")), inputFile.getName, "remote", uploadedFilePath)
+        fileMetaDao.update(meta)
 
-      meta.some
+        inputStream.close()
+        //      TODO remove files in future
+        //      inputFile.delete()
 
+        meta.some
+      }
     }
 
   }
 
-  override def getData(id: Int): Option[FileData] = {
-    fileMetaDao.findOneById(id).map(FileData(_, None))
-  }
+  override def getData(id: Int): Future[Option[FileData]] = fileMetaDao.findOneById(id).map(_.map(FileData(_, None)))
+
 
   override def remove(id: Int, identity: Identity): Unit = {
-    withClient(identity) { client =>
-      getInfo(id).map { fileForRemoval =>
-        log.debug("Removing file from the file storage")
 
-        fileRemover ! (client, fileForRemoval)
+    for {
+      fileInfoOption <- getInfo(id)
+    } yield {
+      withClient(identity) { client =>
+        fileInfoOption.map { fileForRemoval =>
+          log.debug("Removing file from the file storage")
 
-        fileForRemoval.id.map(fileMetaDao.removeById)
+          fileRemover !(client, fileForRemoval)
 
-        log.warn("TODO/ Remove file from file system")
+          fileForRemoval.id.map(fileMetaDao.removeById)
+
+          log.warn("TODO/ Remove file from file system")
+        }
       }
+
     }
   }
 

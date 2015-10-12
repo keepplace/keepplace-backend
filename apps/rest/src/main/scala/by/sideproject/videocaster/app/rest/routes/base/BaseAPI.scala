@@ -1,4 +1,4 @@
-package by.sideproject.videocaster.app.rest.routes
+package by.sideproject.videocaster.app.rest.routes.base
 
 import spray.http.MediaType
 import spray.http.MediaTypes._

@@ -2,6 +2,7 @@ package by.sideproject.videocaster.app.rest.routes
 
 import akka.actor.ActorContext
 import by.sideproject.videocaster.app.rest.oauth.dropbox.DropboxAuthService
+import by.sideproject.videocaster.app.rest.routes.base.BaseAPI
 import by.sideproject.videocaster.services.storage.base.StorageService
 import org.slf4j.LoggerFactory
 import spray.http.StatusCodes

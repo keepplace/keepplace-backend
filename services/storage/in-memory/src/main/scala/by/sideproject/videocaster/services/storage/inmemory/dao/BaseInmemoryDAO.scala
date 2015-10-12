@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
 import scala.collection.mutable.Map
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 abstract class BaseInmemoryDAO[T <: BaseObject[Int]] extends BaseDAO[T, Int] {
 
@@ -17,7 +17,7 @@ abstract class BaseInmemoryDAO[T <: BaseObject[Int]] extends BaseDAO[T, Int] {
   val storage: Map[Int, T] = new mutable.HashMap
 
 
-  override def findOneById(id: Int): Option[T] = storage.get(id)
+  override def findOneById(id: Int): Future[Option[T]] = Future.successful(storage.get(id))
 
   override def update(entity: T): Unit = {
     log.debug(s"Updating entity by ID: $entity")

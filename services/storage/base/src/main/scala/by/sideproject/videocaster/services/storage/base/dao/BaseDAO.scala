@@ -13,7 +13,7 @@ trait BaseDAO[T <: BaseObject[ID], ID] {
   def getNewId: Int = Math.abs(random.nextInt())
 
 
-  def findOneById(id: ID): Option[T]
+  def findOneById(id: ID): Future[Option[T]]
 
   def insert(entity: T): Future[ID]
 
