@@ -26,7 +26,7 @@ abstract class BaseInmemoryDAO[T <: BaseObject[Int]] extends BaseDAO[T, Int] {
 
   override def insert(entity: T): Future[Int] = {
 
-    Future {
+    Future.successful {
       entity.id.map(id => {
         storage.put(id, entity)
         id
@@ -36,7 +36,7 @@ abstract class BaseInmemoryDAO[T <: BaseObject[Int]] extends BaseDAO[T, Int] {
   }
 
 
-  override def findAll(): Future[Seq[T]] = Future(storage.values.toSeq)
+  override def findAll(): Future[Seq[T]] = Future.successful(storage.values.toSeq)
 
   override def removeById(id: Int): Unit = storage.remove(id)
 
