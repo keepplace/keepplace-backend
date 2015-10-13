@@ -11,7 +11,7 @@ import by.sideproject.videocaster.services.downloader.async.{AsynchronousDownloa
 import by.sideproject.videocaster.services.downloader.base.DownloadService
 import by.sideproject.videocaster.services.downloader.sync.SynchronusDownloadService
 import by.sideproject.videocaster.services.storage.base.StorageService
-import by.sideproject.videocaster.services.storage.inmemory.InmemoryStorageService
+import by.sideproject.videocaster.services.storage.h2.H2StorageService
 import by.sideproject.videocaster.services.youtubedl.YoutubeDL
 import spray.can.Http
 
@@ -22,7 +22,10 @@ class ApplicationKernel extends akka.kernel.Bootable {
 
   import by.sideproject.videocaster.app.rest.config.Config._
   implicit val actorSystem = ActorSystem("instacaster")
-  implicit val metaStorageService: StorageService = InmemoryStorageService
+
+  implicit lazy val executionContext = actorSystem.dispatcher
+  implicit val metaStorageService: StorageService = new H2StorageService
+
   implicit val binaryStorageService: FileStorageService = new DropboxFileStorageService(metaStorageService.fileMetaDAO, domain)
 
   implicit val youtubeDl = new YoutubeDL
@@ -31,10 +34,8 @@ class ApplicationKernel extends akka.kernel.Bootable {
   implicit val downloadActor : ActorRef = actorSystem.actorOf(Props(new DownloadActor(synchDownloadService)).withDispatcher("binary-download-dispatcher"))
   implicit val downloadService : DownloadService = new AsynchronousDownloadService(downloadActor, synchDownloadService)
 
-  implicit lazy val executionContext = actorSystem.dispatcher
+
   implicit lazy val timeout = Timeout(60.seconds)
-
-
 
   override def startup(): Unit = {
     val service = actorSystem.actorOf(Props(new SprayApp(metaStorageService, downloadService, binaryStorageService, domain)))
@@ -42,11 +43,13 @@ class ApplicationKernel extends akka.kernel.Bootable {
   }
 
   override def shutdown(): Unit = {
-    /*nothing to do*/
+    metaStorageService.shoutdown
   }
 }
 
 object Boot extends App {
   private val kernel = new ApplicationKernel
   kernel.startup()
+
+
 }

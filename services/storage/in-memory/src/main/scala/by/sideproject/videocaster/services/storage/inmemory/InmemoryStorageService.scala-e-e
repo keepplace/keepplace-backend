@@ -8,4 +8,6 @@ object InmemoryStorageService
   with InmemoryVideoItemDetailsDAOComponent
   with InmemoryFileMetaDAOComponent
   with InmemoryIdentityDAOComponent
-  with InmemoryProfileDAOComponent
+  with InmemoryProfileDAOComponent {
+  override def shoutdown: Unit = {}
+}

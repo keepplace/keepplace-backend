@@ -3,6 +3,23 @@
 ```bash
 brew install youtube-dl ffmpeg libav
 ```
+### Creating database
+
+``` bash
+sbt video-podcast-downloader-rest/universal:stage
+```
+
+```bash
+java -jar apps/rest/target/universal/stage/lib/org.liquibase.liquibase-core-*.jar \
+  --classpath="$(echo apps/rest/target/universal/stage/lib/*.jar | tr ' ' ':')" \
+  --driver=org.h2.Driver \
+  --username=video \
+  --password=video \
+  --changeLogFile=migrations/changelog.xml \
+  --url="jdbc:h2:./test" \
+  "update"
+```
+
 
 ## Development
 ### Running application

@@ -38,6 +38,13 @@ spray-oauth2-client {
 }
 
 
+database = {
+  url = "jdbc:h2:./test"
+  driver = org.h2.Driver
+  user = "video"
+  password = "video"
+}
+
 
 
 binary-download-dispatcher {
@@ -48,11 +55,12 @@ binary-download-dispatcher {
     # minimum number of threads to cap factor-based core number to
     core-pool-size-min = 2
     # No of core threads ... ceil(available processors * factor)
-    core-pool-size-factor = 1.0
-    core-pool-size-max = 5
+    core-pool-size-factor = 2.0
+    core-pool-size-max = 10
   }
-  throughput = 1
+  throughput = 2
 }
+
 
 
 akka.actor.deployment {

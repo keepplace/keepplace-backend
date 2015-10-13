@@ -8,4 +8,8 @@ trait AppVersions {
   val scalazVersion = "7.1.3"
   val specs2Ver = "3.6.4"
   val dropboxVer = "1.8.1"
+  val sl4jVer = "1.7.12"
+
+  val liquibaseVer = "3.4.1"
+  val h2Ver = "1.4.189"
 }

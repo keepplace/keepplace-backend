@@ -1,3 +1,4 @@
+import com.typesafe.sbt.packager.archetypes.{JavaServerAppPackaging, JavaAppPackaging}
 import sbt.Keys._
 import sbt._
 
@@ -7,9 +8,10 @@ object VideoPodcastDownloader extends Build {
   import App.Dependencies._
 
   lazy val root = baseProject("video-podcast-downloader-rest", "apps/rest")
-    .aggregate(storageService, inMemoryStorageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, dropboxFileStorageService, fileStorageService)
-    .dependsOn(storageService, inMemoryStorageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, dropboxFileStorageService, fileStorageService)
+    .aggregate(storageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, dropboxFileStorageService, fileStorageService, h2StorageService)
+    .dependsOn(storageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, dropboxFileStorageService, fileStorageService, h2StorageService)
     .settings(libraryDependencies ++= Seq(config, scalazCore) ++ spray ++ metrics ++ logs ++ akka ++ Seq(dropbox) ++ oauth)
+    .enablePlugins(JavaServerAppPackaging)
 
 
   lazy val storageService = baseProject("storage-base", "services/storage/base") dependsOn (models)
@@ -18,6 +20,10 @@ object VideoPodcastDownloader extends Build {
   lazy val inMemoryStorageService = baseProject("storage-in-memory", "services/storage/in-memory")
     .dependsOn(storageService, models)
     .settings(libraryDependencies ++= scalaz)
+
+  lazy val h2StorageService = baseProject("storage-h2", "services/storage/h2")
+    .dependsOn(inMemoryStorageService, storageService, models)
+    .settings(libraryDependencies ++= h2)
 
   lazy val fileStorageService = baseProject("file-storage-base", "services/filestorage/base") dependsOn (models)
     .settings(libraryDependencies ++= scalaz)

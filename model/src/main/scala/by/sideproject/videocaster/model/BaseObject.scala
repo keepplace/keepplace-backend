@@ -1,5 +1,5 @@
 package by.sideproject.videocaster.model
 
-abstract class BaseObject[PK] {
+trait BaseObject[PK] {
   val id: Option[PK]
 }

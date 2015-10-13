@@ -6,4 +6,7 @@ trait StorageService
   extends VideoItemDetailsDAOComponent
   with FileMetaDAOComponent
   with IdentityDAOComponent
-  with ProfileDAOComponent
+  with ProfileDAOComponent {
+
+  def shoutdown
+}

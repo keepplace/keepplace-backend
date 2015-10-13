@@ -32,8 +32,15 @@ trait AppDependencies {
   val config = "com.typesafe" % "config" % "1.0.0"
 
 
+  val h2 = Seq(
+    "org.liquibase" % "liquibase-core" % liquibaseVer,
+    "com.h2database" % "h2" % h2Ver,
+    "com.typesafe.slick" %% "slick" % "3.1.0",
+    "com.typesafe.slick" %% "slick-hikaricp" % "3.1.0"
+  )
+
   val logs = Seq(
-    "org.slf4j" % "slf4j-log4j12" % "1.7.12",
+    "org.slf4j" % "slf4j-log4j12" % sl4jVer,
     "com.typesafe.akka" %% "akka-slf4j" % akkaVer
   )
 
@@ -95,8 +102,7 @@ trait AppDependencies {
   /*.map(_.excludeAll(ExclusionRule(organization = "org.specs2")))*/
 
   def withSources(allDependencies: Seq[ModuleID]): Seq[ModuleID] = {
-    val (withoutSourcesDeps, withSourcesDeps) =
-      allDependencies.partition(_.name.contains("play"))
+    val (withoutSourcesDeps, withSourcesDeps) = allDependencies.partition(_.name.contains("mysql"))
     withSourcesDeps.map(_ withSources() withJavadoc()) ++ withoutSourcesDeps
   }
 

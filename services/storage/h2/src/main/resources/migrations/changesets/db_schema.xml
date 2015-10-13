@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+    <changeSet author="dkarpenko" id="1.">
+        <createTable tableName="VIDEO_ITEM_DETAILS">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints primaryKey="true" primaryKeyName="ID"/>
+            </column>
+            <column name="TITLE" type="VARCHAR(512)"/>
+            <column name="DESCRIPTION" type="VARCHAR(512)"/>
+            <column name="FILE_META_ID" type="INT"/>
+            <column name="ORIGIN_URL" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ADD_DATE" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PUB_DATE" type="VARCHAR(128)"/>
+            <column name="AUTHOR" type="VARCHAR(128)"/>
+            <column name="NOTE" type="VARCHAR(512)"/>
+            <column name="STATUS" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <modifySql dbms="mysql">
+            <append value=" ENGINE=INNODB"/>
+        </modifySql>
+    </changeSet>
+
+
+</databaseChangeLog>
