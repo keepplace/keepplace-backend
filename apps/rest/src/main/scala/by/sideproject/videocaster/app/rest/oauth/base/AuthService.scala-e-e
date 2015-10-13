@@ -2,18 +2,23 @@ package by.sideproject.videocaster.app.rest.oauth.base
 
 import java.util.UUID
 
+import akka.actor.Props
 import by.sideproject.videocaster.app.rest.oauth.base.utils.OauthConfig
-import by.sideproject.videocaster.model.auth.{Profile, Identity}
+import by.sideproject.videocaster.app.rest.routes.video.handlers.VideosGetEntitiesHandler
+import by.sideproject.videocaster.model.auth.{DropboxIdentity, Profile, Identity}
 import by.sideproject.videocaster.services.storage.base.dao.{ProfileDAO, IdentityDAO}
 import com.dropbox.core.DbxClient
 import org.slf4j.LoggerFactory
 import spray.http.HttpCookie
 import spray.http.StatusCodes._
+import spray.routing
 import spray.routing._
 import spray.routing.authentication._
 import spray.routing.directives.AuthMagnet
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util
+import scala.util.Random
 
 /**
  * TODO: Introduce 2 separate services for storing Identities and Sessions.
@@ -28,17 +33,18 @@ trait AuthService
 
   def profileDAO: ProfileDAO
 
-  implicit def fromFutureAuth[T](auth: ⇒ Future[Authentication[T]])(implicit executor: ExecutionContext): AuthMagnet[T] =
-    new AuthMagnet(onSuccess(auth))
+  implicit val executionContext: ExecutionContext
+
+  implicit def fromFutureAuth[T](auth: ⇒ Future[Authentication[T]]): AuthMagnet[T] = new AuthMagnet(onSuccess(auth))
 
   private val CredentialsMissingReject = Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, List.empty))
   private val CredentialsIncorrectReject = Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List.empty))
 
   def sessionCookie(ctx: RequestContext) = ctx.request.cookies.find(_.name.equals(OauthConfig.SESSION_NAME))
 
-  def cookieAuth(implicit executor: ExecutionContext): RequestContext => Future[Authentication[Identity]] = { ctx: RequestContext =>
+  def cookieAuth: RequestContext => Future[Authentication[Identity]] = { ctx: RequestContext =>
 
-    Future {
+    Future.successful {
       sessionCookie(ctx) match {
         case Some(sessionId) =>
           identityDAO.findBySessionId(sessionId.content) match {
@@ -67,21 +73,27 @@ trait AuthService
     }
   }
 
-  def getProfile(identity: Identity): Option[Profile]
+  def getProfileId(dropboxUID: DropboxIdentity): Future[Int]
 
   def clearSession = deleteCookie(OauthConfig.SESSION_NAME)
 
   val oauth2Routes =
-    (path(OauthConfig.CALLBACK_ROUTE) & parameters('code)) { code =>
-      val identityId = identityDAO.getRandomSessionId
+    (path(OauthConfig.CALLBACK_ROUTE) & parameters('code)) { code=>
 
-      val identity = service.requestAccessToken(code)
 
-      val profile = getProfile(identity)
-      identityDAO.update(identity.copy(id = Some(identityId), profileId = profile.flatMap(_.id)))
+    //    TODO Use more secure algorithm for generating session IDs
+      val sessionId = UUID.randomUUID().toString
 
-      setCookie(HttpCookie(OauthConfig.SESSION_NAME, identity.sessionId, path = Some("/"))) {
-        redirect(OauthConfig.ON_LOGIN_GO_TO, Found)
+//      TODO I'm not sure if it's a good idea to set cookie before completing auth process.
+    setCookie(HttpCookie(OauthConfig.SESSION_NAME, sessionId, path = Some("/"))) {    ctx =>
+            val dropboxIdentity = service.requestAccessToken(code)
+      getProfileId(dropboxIdentity).map { profileId =>
+        identityDAO.insert(Identity(None,dropboxIdentity.uid,sessionId,None,None,Some(dropboxIdentity.fullName),None,None,profileId,Some(dropboxIdentity.oAuth2Info)))
+
+      }.map{ id =>
+          log.debug(s"Redirecting client with session id: $sessionId")
+          ctx.redirect(OauthConfig.ON_LOGIN_GO_TO, Found)
+        }
       }
     } ~
       path(OauthConfig.REDIRECT_ROUTE) {

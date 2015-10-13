@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import scala.collection.mutable
 import scala.collection.mutable.Map
 import scala.concurrent.Future
+import scala.util.Random
 
 abstract class InmemoryBaseDAO[T <: BaseObject[Int]] extends BaseDAO[T, Int] {
 
@@ -17,7 +18,12 @@ abstract class InmemoryBaseDAO[T <: BaseObject[Int]] extends BaseDAO[T, Int] {
   val storage: Map[Int, T] = new mutable.HashMap
 
 
-  override def findOneById(id: Int): Future[Option[T]] = Future.successful(storage.get(id))
+  override def findOneById(id: Int): Future[Option[T]] = Future.successful{
+    log.debug(s"Fetching entity by id $id")
+    val maybeT = storage.get(id)
+    log.debug(s"Fetching entity by id $maybeT")
+    maybeT
+  }
 
   override def update(entity: T): Unit = {
     log.debug(s"Updating entity by ID: $entity")
@@ -27,10 +33,10 @@ abstract class InmemoryBaseDAO[T <: BaseObject[Int]] extends BaseDAO[T, Int] {
   override def insert(entity: T): Future[Int] = {
 
     Future.successful {
-      entity.id.map(id => {
-        storage.put(id, entity)
-        id
-      }).get
+      val id = Math.abs(new Random().nextInt())
+      log.debug(s"Insering entity $entity with id $id")
+      storage.put(id, entity)
+      id
     }
 
   }

@@ -11,5 +11,5 @@ case class Identity(id: Option[Int],
                     fullName: Option[String],
                     email: Option[String],
                     avatarUrl: Option[String],
-                    profileId: Option[Int],
+                    profileId: Int,
                     oAuth2Info: Option[OAuth2Info] = None) extends BaseObject[Int]

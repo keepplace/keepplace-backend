@@ -30,8 +30,9 @@ class LoginHandler(storageService: StorageService, domain: String)
         authenticate(cookieAuth) { identity =>
           pathEnd {
             get {
-              val profile = identity.profileId.map(storageService.profileDAO.findOneById(_))
-              complete(profile)
+              complete{
+                storageService.profileDAO.findOneById(identity.profileId)
+              }
             }
           }
         }
