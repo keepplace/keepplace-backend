@@ -88,7 +88,7 @@ trait AuthService
     setCookie(HttpCookie(OauthConfig.SESSION_NAME, sessionId, path = Some("/"))) {    ctx =>
             val dropboxIdentity = service.requestAccessToken(code)
       getProfileId(dropboxIdentity).map { profileId =>
-        identityDAO.insert(Identity(None,dropboxIdentity.uid,sessionId,None,None,Some(dropboxIdentity.fullName),None,None,profileId,Some(dropboxIdentity.oAuth2Info)))
+        identityDAO.insert(Identity(None,sessionId,profileId,Some(dropboxIdentity.oAuth2Info)))
 
       }.map{ id =>
           log.debug(s"Redirecting client with session id: $sessionId")
