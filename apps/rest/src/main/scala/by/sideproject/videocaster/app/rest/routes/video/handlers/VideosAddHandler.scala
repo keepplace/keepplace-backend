@@ -26,21 +26,19 @@ class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: Do
         error => ctx.complete(error),
         videoItemDetails => {
 
-          val newId: Some[Int] = Some(videoDetailsDAO.getNewId)
-          val videoItemDetailsWithId = videoItemDetails.copy(id = newId)
+          log.debug("Saving newly created video item: " + videoItemDetails)
 
-          log.debug("Saving newly created video item: " + videoItemDetailsWithId)
-
-          for {
-            videoItemID <- videoDetailsDAO.insert(videoItemDetailsWithId)
+          val insertionResult = for {
+            videoItemID <- videoDetailsDAO.insert(videoItemDetails)
             addedVideoItemEntry <- videoDetailsDAO.findOneById(videoItemID)
           } yield {
-            log.debug("Initiating download of video file for: " + videoItemDetailsWithId)
+            log.debug("Initiating download of video file for: " + videoItemDetails)
             addedVideoItemEntry.map(downloadService.download(_, user))
 
-            ctx.complete(addedVideoItemEntry)
+            addedVideoItemEntry
           }
 
+          ctx.complete(insertionResult)
         })
 
 

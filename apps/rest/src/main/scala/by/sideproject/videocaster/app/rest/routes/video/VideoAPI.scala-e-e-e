@@ -22,12 +22,13 @@ class VideoAPI(storageService: StorageService,
 
   protected val log = LoggerFactory.getLogger(this.getClass)
 
-  private val videosGetentitiesHandler = context.actorOf(Props(new VideosGetEntitiesHandler(videoDetailsDAO)))
-  private val videosGetEntityHandler = context.actorOf(Props(new VideosGetEntityHandler(videoDetailsDAO)))
-  private val videosAddHandler = context.actorOf(Props(new VideosAddHandler(videoDetailsDAO, downloadService)))
-  private val videosDeleteEntityHandler = context.actorOf(Props(new VideosDeleteEntityHandler(videoDetailsDAO, binaryStorageService)))
+  private lazy val videoDetailsDAO: VideoItemDetailsDAO = storageService.videoItemDetailsDAO
+  private lazy val videosGetentitiesHandler = context.actorOf(Props(new VideosGetEntitiesHandler(videoDetailsDAO)))
+  private lazy val videosGetEntityHandler = context.actorOf(Props(new VideosGetEntityHandler(videoDetailsDAO)))
+  private lazy val videosAddHandler = context.actorOf(Props(new VideosAddHandler(videoDetailsDAO, downloadService)))
+  private lazy val videosDeleteEntityHandler = context.actorOf(Props(new VideosDeleteEntityHandler(videoDetailsDAO, binaryStorageService)))
 
-  val videoDetailsDAO: VideoItemDetailsDAO = storageService.videoItemDetailsDAO
+
   val route = {
     import by.sideproject.videocaster.app.rest.formaters.json.InstaVideoJsonProtocol._
     import spray.httpx.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
