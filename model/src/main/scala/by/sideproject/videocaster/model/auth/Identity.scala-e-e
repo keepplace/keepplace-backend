@@ -6,4 +6,4 @@ import by.sideproject.videocaster.model.auth.oauth.OAuth2Info
 case class Identity(id: Option[Int],
                     sessionId: String,
                     profileId: Int,
-                    oAuth2Info: Option[OAuth2Info] = None) extends BaseObject[Int]
+                    accessToken: String) extends BaseObject[Int]

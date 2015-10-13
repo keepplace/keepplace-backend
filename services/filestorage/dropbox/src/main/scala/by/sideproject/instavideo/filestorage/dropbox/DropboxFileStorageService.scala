@@ -91,10 +91,9 @@ class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
 
   private def withClient[T](identity: Identity)(f: (DbxClient) => Option[T]): Option[T] = {
     log.debug(s"Setting up client for identity: $identity")
-    identity.oAuth2Info.flatMap { oauthInfo =>
-      val client: DbxClient = new DbxClient(config, oauthInfo.accessToken)
-      f(client)
-    }
+    val client: DbxClient = new DbxClient(config, identity.accessToken)
+    f(client)
+
   }
 
 }
