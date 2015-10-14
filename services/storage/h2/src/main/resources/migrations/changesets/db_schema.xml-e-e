@@ -5,7 +5,7 @@
     <changeSet author="dkarpenko" id="1.">
         <createTable tableName="VIDEO_ITEM_DETAILS">
             <column autoIncrement="true" name="ID" type="INT">
-                <constraints primaryKey="true" primaryKeyName="VIDEO_ITEM_DETAILS_ID"/>
+                <constraints primaryKey="true" primaryKeyName="VIDEO_ITEM_DETAIL_ID"/>
             </column>
             <column name="TITLE" type="VARCHAR(512)"/>
             <column name="DESCRIPTION" type="VARCHAR(512)"/>
@@ -26,7 +26,7 @@
 
         <createTable tableName="PROFILES">
             <column autoIncrement="true" name="ID" type="INT">
-                <constraints primaryKey="true" primaryKeyName="PROFILES_ID"/>
+                <constraints primaryKey="true" primaryKeyName="PROFILE_ID"/>
             </column>
             <column name="USERNAME" type="VARCHAR(512)"/>
             <column name="COUNTRY" type="VARCHAR(512)"/>
@@ -35,13 +35,30 @@
 
         <createTable tableName="IDENTITIES">
             <column autoIncrement="true" name="ID" type="INT">
-                <constraints primaryKey="true" primaryKeyName="IDENTITIES_ID"/>
+                <constraints primaryKey="true" primaryKeyName="IDENTITY_ID"/>
             </column>
             <column name="SESSION_ID" type="VARCHAR(512)"/>
             <column name="PROFILE_ID" type="INT"/>
             <column name="ACCESS_TOKEN" type="VARCHAR(512)"/>
         </createTable>
 
+        <createTable tableName="FILE_METAS">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints primaryKey="true" primaryKeyName="FILE_META_ID"/>
+            </column>
+            <column name="DOWNLOAD_URL" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+
+
+            <column name="SECONDARY_DOWNLOAD_URL" type="VARCHAR(1024)"/>
+
+            <column name="NAME" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PLACEMENT" type="VARCHAR(512)"/>
+            <column name="PATH" type="VARCHAR(512)"/>
+        </createTable>
 
         <modifySql dbms="mysql">
             <append value=" ENGINE=INNODB"/>
