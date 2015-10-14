@@ -17,12 +17,8 @@ object VideoPodcastDownloader extends Build {
   lazy val storageService = baseProject("storage-base", "services/storage/base") dependsOn (models)
     .settings(libraryDependencies ++= scalaz)
 
-  lazy val inMemoryStorageService = baseProject("storage-in-memory", "services/storage/in-memory")
-    .dependsOn(storageService, models)
-    .settings(libraryDependencies ++= scalaz)
-
   lazy val h2StorageService = baseProject("storage-h2", "services/storage/h2")
-    .dependsOn(inMemoryStorageService, storageService, models)
+    .dependsOn(storageService, models)
     .settings(libraryDependencies ++= h2)
 
   lazy val fileStorageService = baseProject("file-storage-base", "services/filestorage/base") dependsOn (models)
