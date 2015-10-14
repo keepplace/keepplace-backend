@@ -1,11 +1,15 @@
 package by.sideproject.videocaster.app.rest.routes
 
 import akka.actor.ActorContext
+import by.sideproject.videocaster.app.rest.oauth.base.utils.OauthConfig
 import by.sideproject.videocaster.app.rest.oauth.dropbox.DropboxAuthService
+import by.sideproject.videocaster.app.rest.rejections.LoginRedirectionRejection
 import by.sideproject.videocaster.app.rest.routes.base.BaseAPI
 import by.sideproject.videocaster.services.storage.base.StorageService
 import org.slf4j.LoggerFactory
 import spray.http.StatusCodes
+import spray.http.StatusCodes._
+import spray.routing.{RejectionHandler, Rejection}
 
 class LoginHandler(storageService: StorageService, domain: String)
                   (implicit context: ActorContext)
@@ -39,7 +43,11 @@ class LoginHandler(storageService: StorageService, domain: String)
       }
     } ~
       path("login") {
-        (get & securedDirective) ( identity => redirect("/auth/profile", StatusCodes.Found))
+        get{
+          authenticate(loginRedirectionAuth) { identity =>
+            redirect("/auth/profile", StatusCodes.Found)
+          }
+        }
       }
 
 }

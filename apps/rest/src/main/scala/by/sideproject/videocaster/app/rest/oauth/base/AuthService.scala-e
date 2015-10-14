@@ -4,6 +4,7 @@ import java.util.UUID
 
 import akka.actor.Props
 import by.sideproject.videocaster.app.rest.oauth.base.utils.OauthConfig
+import by.sideproject.videocaster.app.rest.rejections.LoginRedirectionRejection
 import by.sideproject.videocaster.app.rest.routes.video.handlers.VideosGetEntitiesHandler
 import by.sideproject.videocaster.model.auth.{DropboxIdentity, Profile, Identity}
 import by.sideproject.videocaster.services.storage.base.dao.{ProfileDAO, IdentityDAO}
@@ -35,42 +36,41 @@ trait AuthService
 
   implicit val executionContext: ExecutionContext
 
-  implicit def fromFutureAuth[T](auth: ⇒ Future[Authentication[T]]): AuthMagnet[T] = new AuthMagnet(onSuccess(auth))
+
 
   private val CredentialsMissingReject = Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, List.empty))
   private val CredentialsIncorrectReject = Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List.empty))
+  private def sendToLoginReject(resolution: String) = Left(LoginRedirectionRejection(resolution))
 
   def sessionCookie(ctx: RequestContext) = ctx.request.cookies.find(_.name.equals(OauthConfig.SESSION_NAME))
 
+  implicit def fromFutureAuth[T](auth: ⇒ Future[Authentication[T]]): AuthMagnet[T] = new AuthMagnet(onSuccess(auth))
+
+
   def cookieAuth: RequestContext => Future[Authentication[Identity]] = { ctx: RequestContext =>
-
-    Future.successful {
-      sessionCookie(ctx) match {
-        case Some(sessionId) =>
-          identityDAO.findBySessionId(sessionId.content) match {
-            case Some(user) => Right(user)
-            case _ => {
-              clearSession
-              CredentialsIncorrectReject
-            }
-          }
-        case None => CredentialsMissingReject
-      }
-    }
-  }
-
-  val securedDirective: Directive1[Identity] = {
-    optionalCookie(OauthConfig.SESSION_NAME).flatMap { sessionCookieId =>
-      sessionCookieId match {
-        case Some(cookie) => {
-          identityDAO.findBySessionId(cookie.content) match {
-            case Some(session) => provide(session)
-            case _ => redirect(OauthConfig.REDIRECT_ROUTE, Found)
+      sessionCookie(ctx).map { sessionCookieId =>
+        identityDAO.findBySessionId(sessionCookieId.content).map {
+          case Some(user) => Right(user)
+          case _ => {
+            clearSession
+            CredentialsIncorrectReject
           }
         }
-        case None => redirect(OauthConfig.REDIRECT_ROUTE, Found)
+      }.getOrElse(Future.successful(CredentialsMissingReject))
+  }
+
+
+  def loginRedirectionAuth: RequestContext => Future[Authentication[Identity]] = { ctx: RequestContext =>
+
+    sessionCookie(ctx).map { sessionCookieId =>
+      identityDAO.findBySessionId(sessionCookieId.content).map {
+        case Some(user) => Right(user)
+        case _ => {
+          clearSession
+          sendToLoginReject("Can't find any session by provided ID")
+        }
       }
-    }
+    }.getOrElse(Future.successful(sendToLoginReject("Session ID is not provided")))
   }
 
   def getProfileId(dropboxUID: DropboxIdentity): Future[Int]
