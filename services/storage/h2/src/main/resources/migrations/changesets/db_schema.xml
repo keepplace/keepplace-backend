@@ -5,7 +5,7 @@
     <changeSet author="dkarpenko" id="1.">
         <createTable tableName="VIDEO_ITEM_DETAILS">
             <column autoIncrement="true" name="ID" type="INT">
-                <constraints primaryKey="true" primaryKeyName="ID"/>
+                <constraints primaryKey="true" primaryKeyName="VIDEO_ITEM_DETAILS_ID"/>
             </column>
             <column name="TITLE" type="VARCHAR(512)"/>
             <column name="DESCRIPTION" type="VARCHAR(512)"/>
@@ -23,6 +23,25 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <createTable tableName="PROFILES">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints primaryKey="true" primaryKeyName="PROFILES_ID"/>
+            </column>
+            <column name="USERNAME" type="VARCHAR(512)"/>
+            <column name="COUNTRY" type="VARCHAR(512)"/>
+            <column name="DROPBOX_ID" type="VARCHAR(512)"/>
+        </createTable>
+
+        <createTable tableName="IDENTITIES">
+            <column autoIncrement="true" name="ID" type="INT">
+                <constraints primaryKey="true" primaryKeyName="IDENTITIES_ID"/>
+            </column>
+            <column name="SESSION_ID" type="VARCHAR(512)"/>
+            <column name="PROFILE_ID" type="INT"/>
+            <column name="ACCESS_TOKEN" type="VARCHAR(512)"/>
+        </createTable>
+
 
         <modifySql dbms="mysql">
             <append value=" ENGINE=INNODB"/>

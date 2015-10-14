@@ -1,7 +1,7 @@
 package by.sideproject.videocaster.services.storage.h2
 
 import by.sideproject.videocaster.services.storage.base.StorageService
-import by.sideproject.videocaster.services.storage.h2.components.H2VideoItemDetailsDAOComponent
+import by.sideproject.videocaster.services.storage.h2.components.{H2IdentityDAOComponent, H2ProfileDAOComponent, H2VideoItemDetailsDAOComponent}
 import by.sideproject.videocaster.services.storage.inmemory.components._
 import slick.driver.H2Driver.api._
 
@@ -11,8 +11,8 @@ class H2StorageService(implicit executionContext: ExecutionContext)
   extends StorageService
   with H2VideoItemDetailsDAOComponent
   with InmemoryFileMetaDAOComponent
-  with InmemoryIdentityDAOComponent
-  with InmemoryProfileDAOComponent {
+  with H2IdentityDAOComponent
+  with H2ProfileDAOComponent {
 
 
   implicit val database = Database.forConfig("database")
