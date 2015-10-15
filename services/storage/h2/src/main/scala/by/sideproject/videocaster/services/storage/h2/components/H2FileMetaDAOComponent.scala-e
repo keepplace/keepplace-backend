@@ -15,6 +15,7 @@ trait H2FileMetaDAOComponent
 
   implicit def ec: ExecutionContext
 
-  lazy val fileMetaDAO: FileMetaDAO = new H2FileMetaDAO
+  lazy val h2FileMetaDAO: H2FileMetaDAO = new H2FileMetaDAO
+  lazy val fileMetaDAO: FileMetaDAO = h2FileMetaDAO
 
 }

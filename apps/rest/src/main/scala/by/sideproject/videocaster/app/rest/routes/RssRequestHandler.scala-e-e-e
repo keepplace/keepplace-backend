@@ -21,7 +21,7 @@ class RssRequestHandler(storageService: StorageService, domain: String)
   extends DropboxAuthService(storageService.identityDAO, storageService.profileDAO)
   with BaseAPI {
 
-  private val fileMetaDAO = storageService.fileMetaDAO
+  private val podcastItemDAO = storageService.podcastItemDAO
 
 
   def route =
@@ -33,60 +33,13 @@ class RssRequestHandler(storageService: StorageService, domain: String)
           get {
             respondWithMediaType(xml) {
               complete {
-                getPodcastItems.map(PodcastChannel(_))
+                user.id.map(id => podcastItemDAO.fetchPodcastItems(id).map(PodcastChannel(_)))
               }
             }
           }
         }
       }
     }
-
-
-  private def getPodcastItems: Future[Seq[PodcastItem]] = {
-
-    storageService.
-
-    for {
-      videoItems <- storageService.videoItemDetailsDAO.findAll()
-      filteredVideoItems = videoItems.filter(_.isDownloaded)
-
-      videoItemWithDefinedFileMeta = filteredVideoItems
-        .map(videoItem => (videoItem, videoItem.fileMetaId))
-        .flatMap { case (videoItemDetail: VideoItemDetails, fileMetaIdOption: Option[Int]) =>
-          fileMetaIdOption.map((videoItemDetail, _))
-        }
-
-      videoItemsWithFileMetaFutureOptions = videoItemWithDefinedFileMeta.map {
-        case (item: VideoItemDetails, fileMetaId: Int) => (item, fileMetaDAO.findOneById(fileMetaId))
-      }.map { case (item: VideoItemDetails, metaOptionFuture: Future[Option[FileMeta]]) =>
-        // all options with defined value
-
-        metaOptionFuture.map {
-          case Some(meta) => Success(buildPodcastItem(item, meta))
-          case None => Failure
-        }.collect { case Success(s: PodcastItem) => s }
-
-      }
-
-      podcastItems <- Future.sequence(videoItemsWithFileMetaFutureOptions)
-
-    } yield {
-
-      podcastItems
-    }
-
-
-  }
-
-  private def buildPodcastItem(item: VideoItemDetails, meta: FileMeta): PodcastItem = {
-    PodcastItem(
-      item.id.getOrElse(-1),
-      item.title.getOrElse(""),
-      item.description.getOrElse(""),
-      item.author.getOrElse(""),
-      item.pubDate.getOrElse(""),
-      meta.downloadURL)
-  }
 
   private def podcastChannelMarshaller(contentType: ContentType, more: ContentType*): Marshaller[PodcastChannel] =
     Marshaller.delegate[PodcastChannel, Elem](contentType +: more: _*) { (data: PodcastChannel) ⇒

@@ -27,7 +27,7 @@ abstract class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
 
     val fileName: String = new File(path).getName
 
-    val downloadId = generateDownloadId
+    val downloadId = generateDownloadToken
     val meta = new FileMeta(None, downloadId, fileURL(downloadId), None, fileName, "local", path)
 
     for {
@@ -70,5 +70,5 @@ abstract class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
 
   protected def fileURL(id: String) = "http://" + domain + "/data/" + id + "/download"
 
-  protected def generateDownloadId = UUID.randomUUID().toString
+  protected def generateDownloadToken = UUID.randomUUID().toString
 }

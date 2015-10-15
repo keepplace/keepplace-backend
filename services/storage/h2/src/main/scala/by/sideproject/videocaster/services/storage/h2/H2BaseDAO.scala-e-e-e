@@ -16,7 +16,9 @@ class H2BaseDAO[T <: BaseObject[Int], R <: BaseT[T]](val tableQuery: TableQuery[
   private val log = LoggerFactory.getLogger(this.getClass)
   private val createReturningId = tableQuery returning tableQuery.map { item : R => item.id }
 
-  def findOneById(id: Int): Future[Option[T]] = database.run(tableQuery.filter(_.id === id).result.headOption)
+  def findOneById(id: Int): Future[Option[T]] = {
+    database.run(tableQuery.filter(_.id === id).result.headOption)
+  }
 
   override def insert(entity: T): Future[Int] = database.run(createReturningId += entity)
 

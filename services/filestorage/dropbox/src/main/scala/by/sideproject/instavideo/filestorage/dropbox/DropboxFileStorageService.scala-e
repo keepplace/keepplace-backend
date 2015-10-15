@@ -40,29 +40,28 @@ class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
     val inputStream = new FileInputStream(inputFile)
     val filePath = s"/${inputFile.getName}"
 
-    Future {
+
       withClient(identity) { client =>
         log.debug("With client for: " + client.getAccountInfo)
 
         val uploadedFile = client.uploadFile(filePath, DbxWriteMode.add(), inputFile.length(), inputStream)
+        inputStream.close()
+
+
         log.debug("Uploaded: " + uploadedFile.toString())
 
         val uploadedFilePath = uploadedFile.path
 
         val sharableUrl: String = client.createShareableUrl(uploadedFilePath)
-
-        val downloadId = generateDownloadId
-
-        val meta = new FileMeta(None, downloadId, fileURL(downloadId), Some(sharableUrl.replace("dl=0", "dl=1")), inputFile.getName, "remote", uploadedFilePath)
-        fileMetaDao.update(meta)
-
-        inputStream.close()
         //      TODO remove files in future
         //      inputFile.delete()
 
-        meta.some
+        val downloadId = generateDownloadToken
+
+        val meta = new FileMeta(None, downloadId, fileURL(downloadId), Some(sharableUrl.replace("dl=0", "dl=1")), inputFile.getName, "remote", uploadedFilePath)
+        fileMetaDao.insert(meta).map(generatedId => meta.copy(id = generatedId.some).some)
+
       }
-    }
 
   }
 
@@ -89,7 +88,7 @@ class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
     }
   }
 
-  private def withClient[T](identity: Identity)(f: (DbxClient) => Option[T]): Option[T] = {
+  private def withClient[T](identity: Identity)(f: (DbxClient) => T): T = {
     log.debug(s"Setting up client for identity: $identity")
     val client: DbxClient = new DbxClient(config, identity.accessToken)
     f(client)

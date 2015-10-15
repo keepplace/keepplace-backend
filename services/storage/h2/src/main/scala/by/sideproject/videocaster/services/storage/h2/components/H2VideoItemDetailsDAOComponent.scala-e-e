@@ -13,6 +13,8 @@ trait H2VideoItemDetailsDAOComponent
   implicit def database: Database
   implicit def ec: ExecutionContext
 
-  lazy val videoItemDetailsDAO: VideoItemDetailsDAO = new H2VideoItemDetailsDAO
+  lazy val h2VideoItemDetailsDAO: H2VideoItemDetailsDAO = new H2VideoItemDetailsDAO
+
+  lazy val videoItemDetailsDAO: VideoItemDetailsDAO = h2VideoItemDetailsDAO
 
 }
