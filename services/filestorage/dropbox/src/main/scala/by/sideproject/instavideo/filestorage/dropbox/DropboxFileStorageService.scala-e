@@ -41,40 +41,42 @@ class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
     val filePath = s"/${inputFile.getName}"
 
 
-      withClient(identity) { client =>
-        log.debug("With client for: " + client.getAccountInfo)
+    withClient(identity) { client =>
+      log.debug("With client for: " + client.getAccountInfo)
 
-        val uploadedFile = client.uploadFile(filePath, DbxWriteMode.add(), inputFile.length(), inputStream)
-        inputStream.close()
+      val uploadedFile = client.uploadFile(filePath, DbxWriteMode.add(), inputFile.length(), inputStream)
+      inputStream.close()
 
 
-        log.debug("Uploaded: " + uploadedFile.toString())
+      log.debug("Uploaded: " + uploadedFile.toString())
 
-        val uploadedFilePath = uploadedFile.path
+      val uploadedFilePath = uploadedFile.path
 
-        val sharableUrl: String = client.createShareableUrl(uploadedFilePath)
-        //      TODO remove files in future
-        //      inputFile.delete()
+      val sharableUrl: String = client.createShareableUrl(uploadedFilePath)
+      //      TODO remove files in future
+      //      inputFile.delete()
 
-        val downloadId = generateDownloadToken
+      val downloadId = generateDownloadToken
 
-        val meta = new FileMeta(None, downloadId, fileURL(downloadId), Some(sharableUrl.replace("dl=0", "dl=1")), inputFile.getName, "remote", uploadedFilePath)
-        fileMetaDao.insert(meta).map(generatedId => meta.copy(id = generatedId.some).some)
+      val meta = new FileMeta(None, downloadId, fileURL(downloadId), Some(sharableUrl.replace("dl=0", "dl=1")), inputFile.getName, "remote", uploadedFilePath)
+      fileMetaDao.insert(meta).map(generatedId => meta.copy(id = generatedId.some).some)
 
-      }
+    }
 
   }
 
   override def getData(id: Int): Future[Option[FileData]] = fileMetaDao.findOneById(id).map(_.map(FileData(_, None)))
 
 
-  override def remove(id: Int, identity: Identity): Unit = {
+  override def remove(id: Int, identity: Identity) = {
 
     for {
       fileInfoOption <- getInfo(id)
+
     } yield {
-      withClient(identity) { client =>
-        fileInfoOption.map { fileForRemoval =>
+      fileInfoOption.foreach { fileForRemoval =>
+        withClient(identity) { client =>
+
           log.debug("Removing file from the file storage")
 
           fileRemover !(client, fileForRemoval)
