@@ -50,6 +50,10 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="DOWNLOAD_ID" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+
 
             <column name="SECONDARY_DOWNLOAD_URL" type="VARCHAR(1024)"/>
 

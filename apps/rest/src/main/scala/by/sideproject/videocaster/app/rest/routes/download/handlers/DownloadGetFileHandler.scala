@@ -4,6 +4,7 @@ import akka.actor.Actor
 import by.sideproject.instavideo.filestorage.base.FileStorageService
 import by.sideproject.videocaster.app.rest.routes.download.requests.DownloadGetFileRequest
 import by.sideproject.videocaster.model.filestorage.FileData
+import by.sideproject.videocaster.services.storage.base.dao.FileMetaDAO
 import org.slf4j.LoggerFactory
 import spray.http.HttpHeaders.RawHeader
 import spray.http.MediaTypes._
@@ -12,7 +13,7 @@ import spray.httpx.marshalling.{Marshaller, MarshallingContext}
 
 import scala.concurrent.ExecutionContext
 
-class DownloadGetFileHandler(binaryStorageService: FileStorageService)(implicit executionContext: ExecutionContext)
+class DownloadGetFileHandler(binaryStorageService: FileStorageService, fileMetaDAO: FileMetaDAO)(implicit executionContext: ExecutionContext)
   extends Actor {
   val log = LoggerFactory.getLogger(this.getClass)
 
@@ -27,22 +28,31 @@ class DownloadGetFileHandler(binaryStorageService: FileStorageService)(implicit 
   override def receive = {
     case DownloadGetFileRequest(ctx, id) => {
 
-      binaryStorageService.getData(id).map { data =>
-        data.map { binaryData =>
-          binaryData.meta.placement match {
-            case "local" => {
-              log.debug(s"Sending binary information by fileId: ${binaryData.meta}")
-              ctx.complete(binaryData)
-            }
-            case "remote" =>
-              binaryData.meta.secondaryDownloadURL.map { reditectUrl =>
-                log.debug(s"Redirecting to actual file URL: ${binaryData.meta}")
-                ctx.redirect(reditectUrl, StatusCodes.Found)
+      fileMetaDAO.findDownloadId(id).map { fileOption =>
+
+
+        fileOption.map { file =>
+          file.id.map { fileMetaId =>
+
+              binaryStorageService.getData(fileMetaId).map { data =>
+                data.map { binaryData =>
+                  binaryData.meta.placement match {
+                    case "local" => {
+                      log.debug(s"Sending binary information by fileId: ${binaryData.meta}")
+                      ctx.complete(binaryData)
+                    }
+                    case "remote" =>
+                      binaryData.meta.secondaryDownloadURL.map { reditectUrl =>
+                        log.debug(s"Redirecting to actual file URL: ${binaryData.meta}")
+                        ctx.redirect(reditectUrl, StatusCodes.Found)
+                      }
+                  }
+                }
               }
           }
+
+
         }
-
-
       }
 
     }

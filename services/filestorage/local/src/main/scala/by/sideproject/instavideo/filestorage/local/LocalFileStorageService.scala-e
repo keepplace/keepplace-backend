@@ -1,6 +1,7 @@
 package by.sideproject.instavideo.filestorage.local
 
 import java.io.File
+import java.util.UUID
 
 import by.sideproject.instavideo.filestorage.base.FileStorageService
 import by.sideproject.videocaster.model.auth.Identity
@@ -11,7 +12,7 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String)(implicit executionContext: ExecutionContext) extends FileStorageService {
+abstract class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String)(implicit executionContext: ExecutionContext) extends FileStorageService {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -24,10 +25,10 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String)(implicit
    */
   override def upload(path: String, account: Identity): Future[Option[FileMeta]] = {
 
-    val id = fileMetaDao.getNewId
     val fileName: String = new File(path).getName
 
-    val meta = new FileMeta(Some(id), fileURL(id), None, fileName, "local", path)
+    val downloadId = generateDownloadId
+    val meta = new FileMeta(None, downloadId, fileURL(downloadId), None, fileName, "local", path)
 
     for {
       insertedFileMetaId <- fileMetaDao.insert(meta)
@@ -67,5 +68,7 @@ class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String)(implicit
 
   override def getInfo(id: Int): Future[Option[FileMeta]] = fileMetaDao.findOneById(id)
 
-  protected def fileURL(id: Int) = "http://" + domain + "/data/" + id + "/download"
+  protected def fileURL(id: String) = "http://" + domain + "/data/" + id + "/download"
+
+  protected def generateDownloadId = UUID.randomUUID().toString
 }

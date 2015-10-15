@@ -7,6 +7,7 @@ import by.sideproject.videocaster.app.rest.routes.base.requests.EntityRequest
 import by.sideproject.videocaster.app.rest.routes.download.handlers.DownloadGetFileHandler
 import by.sideproject.videocaster.app.rest.routes.download.requests.DownloadGetFileRequest
 import by.sideproject.videocaster.app.rest.routes.video.handlers.VideosGetEntitiesHandler
+import by.sideproject.videocaster.services.storage.base.dao.FileMetaDAO
 import org.slf4j.LoggerFactory
 import spray.http.HttpHeaders.RawHeader
 import spray.http.{HttpData, StatusCodes}
@@ -14,22 +15,22 @@ import spray.http.{HttpData, StatusCodes}
 import scala.concurrent.ExecutionContext
 
 
-class DownloadAPI(binaryStorageService: FileStorageService)(implicit context: ActorContext) extends BaseAPI {
+class DownloadAPI(binaryStorageService: FileStorageService, fileMetaDAO: FileMetaDAO)(implicit context: ActorContext) extends BaseAPI {
 
   val log = LoggerFactory.getLogger(this.getClass)
 
   private implicit val executionContext = context.dispatcher
-  private val filesDownloadHandler = context.actorOf(Props(new DownloadGetFileHandler(binaryStorageService)))
+  private val filesDownloadHandler = context.actorOf(Props(new DownloadGetFileHandler(binaryStorageService, fileMetaDAO)))
 
 
   def actorRefFactory = context
 
   def route =
-    pathPrefix("data" / entityIdParameter / "download") { binaryFileId =>
-      log.debug("Downloading file by id: " + binaryFileId)
+    pathPrefix("data" / Segment / "download") { downloadId =>
+      log.debug("Downloading file by id: " + downloadId)
       pathEnd {
         get {
-          ctx => filesDownloadHandler ! DownloadGetFileRequest(ctx,binaryFileId)
+          ctx => filesDownloadHandler ! DownloadGetFileRequest(ctx,downloadId)
         }
       }
     }

@@ -44,6 +44,8 @@ class RssRequestHandler(storageService: StorageService, domain: String)
 
   private def getPodcastItems: Future[Seq[PodcastItem]] = {
 
+    storageService.
+
     for {
       videoItems <- storageService.videoItemDetailsDAO.findAll()
       filteredVideoItems = videoItems.filter(_.isDownloaded)
