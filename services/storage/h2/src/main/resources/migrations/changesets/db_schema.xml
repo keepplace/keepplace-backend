@@ -22,6 +22,10 @@
             <column name="STATUS" type="VARCHAR(32)">
                 <constraints nullable="false"/>
             </column>
+            <column name="PROFILE_ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
         </createTable>
 
         <createTable tableName="PROFILES">

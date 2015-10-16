@@ -1,12 +1,15 @@
 package by.sideproject.videocaster.app.rest.routes.video.handlers
 
 import akka.actor.Actor
-import by.sideproject.videocaster.app.rest.routes.video.requests.{VideosAddRequest, VideosGetEntitiesRequest}
+import by.sideproject.videocaster.app.rest.routes.video.requests.VideosAddRequest
+import by.sideproject.videocaster.model.auth.Identity
+import by.sideproject.videocaster.model.{VideoItemDetails, VideoItemDownloadDetails}
 import by.sideproject.videocaster.services.downloader.base.DownloadService
 import by.sideproject.videocaster.services.storage.base.dao.VideoItemDetailsDAO
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
+import scalaz.Scalaz._
 
 class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: DownloadService)
                       (implicit executionContext: ExecutionContext) extends Actor {
@@ -15,6 +18,10 @@ class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: Do
   import spray.httpx.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
 
   val log = LoggerFactory.getLogger(this.getClass)
+
+  implicit def videoItemDownloadDetailsToVideoItemDetails(downloadDetails: VideoItemDownloadDetails)(implicit identity: Identity) : VideoItemDetails =
+    VideoItemDetails(None, downloadDetails.title.some, downloadDetails.description.some, None, downloadDetails.ur, "today",
+      "info", downloadDetails.pubDate.some, downloadDetails.author.some, None, identity.profileId)
 
   override def receive = {
     case VideosAddRequest(ctx, request, user) => {
@@ -28,6 +35,7 @@ class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: Do
 
           log.debug("Saving newly created video item: " + videoItemDetails)
 
+          implicit val identity = user
           val insertionResult = for {
             videoItemID <- videoDetailsDAO.insert(videoItemDetails)
             addedVideoItemEntry <- videoDetailsDAO.findOneById(videoItemID)

@@ -1,10 +1,9 @@
 package by.sideproject.videocaster.services.downloader.sync
 
 import by.sideproject.instavideo.filestorage.base.FileStorageService
-import by.sideproject.videocaster.model.VideoItemDetails
 import by.sideproject.videocaster.model.auth.Identity
-import by.sideproject.videocaster.model.downloads.DownloadedFileInfo
 import by.sideproject.videocaster.model.util.Error
+import by.sideproject.videocaster.model.{VideoItemDetails, VideoItemDownloadDetails}
 import by.sideproject.videocaster.services.downloader.base.DownloadService
 import by.sideproject.videocaster.services.storage.base.StorageService
 import by.sideproject.videocaster.services.youtubedl.YoutubeDL
@@ -18,13 +17,13 @@ class SynchronusDownloadService(youDl: YoutubeDL, storage: StorageService, binar
   extends DownloadService {
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  override def getVideoDetails(url: String): Either[Error, VideoItemDetails] = {
+  override def getVideoDetails(url: String): Either[Error, VideoItemDownloadDetails] = {
     log.debug("Fetching information on video file: " + url)
     val videoInfoResult = youDl.getInfo(url)
     videoInfoResult match {
       case Right(videoInfo) => {
         log.debug("Information on video item has been retrieved: " + videoInfo)
-        Right(VideoItemDetails(None, Some(videoInfo.title), Some(videoInfo.description), None, url, "today", "info", Some(videoInfo.pubDate), Some(videoInfo.author), None))
+        Right(VideoItemDownloadDetails(videoInfo.title, videoInfo.description, url, videoInfo.pubDate, videoInfo.author))
       }
       case Left(error) => Left(error)
     }

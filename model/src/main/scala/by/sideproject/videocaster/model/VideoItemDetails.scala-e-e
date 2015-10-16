@@ -9,7 +9,9 @@ case class VideoItemDetails(id: Option[Int],
                             status: String,
                             pubDate: Option[String],
                             author: Option[String],
-                            note: Option[String]) extends BaseObject[Int] {
+                            note: Option[String],
+                            profileId: Int
+                             ) extends BaseObject[Int] {
 
   def isDownloaded = "downloaded".equals(status)
 }
