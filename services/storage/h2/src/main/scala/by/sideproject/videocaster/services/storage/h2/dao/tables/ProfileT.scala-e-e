@@ -10,7 +10,8 @@ class ProfileT(tag: Tag) extends BaseT[Profile](tag ,"PROFILES") {
   def username = column[String]("USERNAME")
   def country = column[String]("COUNTRY")
   def dropboxId= column[String]("DROPBOX_ID")
+  def rssToken = column[String]("RSS_TOKEN")
 
 
-  override def * =  (id.?, username.?, country.?, dropboxId) <> ((Profile.apply _).tupled, Profile.unapply)
+  override def * =  (id.?, username.?, country.?, dropboxId, rssToken) <> ((Profile.apply _).tupled, Profile.unapply)
 }

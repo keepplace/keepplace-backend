@@ -1,5 +1,7 @@
 package by.sideproject.videocaster.app.rest.routes
 
+import java.util.UUID
+
 import akka.actor.ActorContext
 import by.sideproject.videocaster.app.rest.oauth.dropbox.DropboxAuthService
 import by.sideproject.videocaster.app.rest.routes.base.BaseAPI
@@ -23,11 +25,12 @@ class RssRequestHandler(storageService: StorageService, domain: String)
 
   private val podcastItemDAO = storageService.podcastItemDAO
 
+  private implicit def uuidToString(uuid: UUID): String = uuid.toString
 
   def route =
 
-    path("rss") {
-      authenticate(cookieAuth) { user =>
+    path("rss" / JavaUUID) { token =>
+      authenticate(rssTokenAuth(token)) { user =>
         implicit val PodcatChannelMarshaller = podcastChannelMarshaller(xml, xml)
         pathEnd {
           get {

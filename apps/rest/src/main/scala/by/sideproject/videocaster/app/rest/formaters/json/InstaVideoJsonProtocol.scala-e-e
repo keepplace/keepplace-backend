@@ -17,7 +17,7 @@ object InstaVideoJsonProtocol extends DefaultJsonProtocol with CollectionFormats
   implicit val addVideoRequestFormat = jsonFormat1(AddVideoRequest)
   implicit val oAuth2InfoFormat = jsonFormat5(OAuth2Info)
   implicit val identityFormat = jsonFormat4(Identity)
-  implicit val profileFormat = jsonFormat4(Profile)
+  implicit val profileFormat = jsonFormat5(Profile)
   implicit val errorFormat = jsonFormat2(Error)
 
 }

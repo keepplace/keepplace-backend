@@ -7,17 +7,17 @@
             <column autoIncrement="true" name="ID" type="INT">
                 <constraints primaryKey="true" primaryKeyName="VIDEO_ITEM_DETAIL_ID"/>
             </column>
-            <column name="TITLE" type="VARCHAR(512)"/>
-            <column name="DESCRIPTION" type="VARCHAR(512)"/>
+            <column name="TITLE" type="VARCHAR(2048)"/>
+            <column name="DESCRIPTION" type="VARCHAR(4096)"/>
             <column name="FILE_META_ID" type="INT"/>
-            <column name="ORIGIN_URL" type="VARCHAR(512)">
+            <column name="ORIGIN_URL" type="VARCHAR(2048)">
                 <constraints nullable="false"/>
             </column>
             <column name="ADD_DATE" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
-            <column name="PUB_DATE" type="VARCHAR(128)"/>
-            <column name="AUTHOR" type="VARCHAR(128)"/>
+            <column name="PUB_DATE" type="VARCHAR(512)"/>
+            <column name="AUTHOR" type="VARCHAR(512)"/>
             <column name="NOTE" type="VARCHAR(512)"/>
             <column name="STATUS" type="VARCHAR(32)">
                 <constraints nullable="false"/>
@@ -35,6 +35,9 @@
             <column name="USERNAME" type="VARCHAR(512)"/>
             <column name="COUNTRY" type="VARCHAR(512)"/>
             <column name="DROPBOX_ID" type="VARCHAR(512)"/>
+            <column name="RSS_TOKEN" type="VARCHAR(512)">
+                <constraints nullable="false" unique="true"/>
+            </column>
         </createTable>
 
         <createTable tableName="IDENTITIES">
@@ -55,7 +58,7 @@
             </column>
 
             <column name="DOWNLOAD_ID" type="VARCHAR(1024)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true"/>
             </column>
 
 

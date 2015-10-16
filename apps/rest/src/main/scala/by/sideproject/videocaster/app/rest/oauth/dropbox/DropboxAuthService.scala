@@ -1,5 +1,7 @@
 package by.sideproject.videocaster.app.rest.oauth.dropbox
 
+import java.util.UUID
+
 import akka.actor.ActorRefFactory
 import by.sideproject.videocaster.app.rest.oauth.base.{AuthService, OAuth2Provider}
 import by.sideproject.videocaster.model.auth.{DropboxIdentity, Profile}
@@ -28,14 +30,13 @@ class DropboxAuthService(identityStorage: IdentityDAO, profileStorage: ProfileDA
 
     log.debug(s"Setting up client for identity: $identity")
 
-
-
     profileDAO.findByDropboxId(identity.uid).flatMap { currentProfile =>
       log.debug(s"Fetched information on current profile: $currentProfile")
       currentProfile match {
-        case Some(Profile(Some(id),_,_,_)) => Future.successful(id)
+        case Some(Profile(Some(id),_,_,_,_)) => Future.successful(id)
         case None => {
-          val newProfile = Profile(None, Some(identity.fullName), None, identity.uid)
+          val rssToken = UUID.randomUUID().toString
+          val newProfile = Profile(None, Some(identity.fullName), None, identity.uid,rssToken)
           profileDAO.insert(newProfile)
         }
       }

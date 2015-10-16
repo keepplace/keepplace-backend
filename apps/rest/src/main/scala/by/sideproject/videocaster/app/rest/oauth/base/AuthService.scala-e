@@ -59,6 +59,13 @@ trait AuthService
       }.getOrElse(Future.successful(CredentialsMissingReject))
   }
 
+  def rssTokenAuth(rssToken: String): RequestContext => Future[Authentication[Profile]] = { ctx: RequestContext =>
+    profileDAO.findByRssToken(rssToken).map {
+      case Some(user) => Right(user)
+      case _ => CredentialsMissingReject
+    }
+  }
+
 
   def loginRedirectionAuth: RequestContext => Future[Authentication[Identity]] = { ctx: RequestContext =>
 

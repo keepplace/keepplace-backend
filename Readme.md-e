@@ -6,7 +6,7 @@ brew install youtube-dl ffmpeg libav
 ### Creating database
 
 ``` bash
-sbt video-podcast-downloader-rest/universal:stage
+bin/sbt video-podcast-downloader-rest/universal:stage
 ```
 
 ```bash

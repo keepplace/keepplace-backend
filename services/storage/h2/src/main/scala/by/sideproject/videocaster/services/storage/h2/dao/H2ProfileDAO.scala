@@ -13,7 +13,12 @@ class H2ProfileDAO
   (implicit executionContext: ExecutionContext, database: Database)
   extends H2BaseDAO[Profile, ProfileT](TableQuery[ProfileT])
   with ProfileDAO {
+
   override def findByDropboxId(dropboxId: String): Future[Option[Profile]] = {
     database.run(tableQuery.filter(_.dropboxId === dropboxId).result.headOption)
+  }
+
+  override def findByRssToken(rssToken: String): Future[Option[Profile]] = {
+    database.run(tableQuery.filter(_.rssToken === rssToken).result.headOption)
   }
 }
