@@ -1,4 +1,5 @@
 import com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging
+import com.typesafe.sbt.packager.debian.DebianPlugin
 import sbt.Keys._
 import sbt._
 
@@ -17,7 +18,7 @@ object VideoPodcastDownloader extends Build {
       maintainer in Linux := "Denis Karpenko <denis@karpenko.me>",
       packageSummary in Linux := "keep.place application",
       packageDescription := "keep.place application"
-    ).enablePlugins(JavaServerAppPackaging)
+    ).enablePlugins(JavaServerAppPackaging, DebianPlugin)
 
   lazy val storageService = baseProject("storage-base", "services/storage/base") dependsOn (models)
     .settings(libraryDependencies ++= scalaz)
