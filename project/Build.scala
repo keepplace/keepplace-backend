@@ -1,4 +1,4 @@
-import com.typesafe.sbt.packager.archetypes.{JavaServerAppPackaging, JavaAppPackaging}
+import com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging
 import sbt.Keys._
 import sbt._
 
@@ -6,13 +6,18 @@ object VideoPodcastDownloader extends Build {
 
   import App.BuildSettings._
   import App.Dependencies._
+  import com.typesafe.sbt.SbtNativePackager._
+  import com.typesafe.sbt.packager.Keys._
+
 
   lazy val root = baseProject("video-podcast-downloader-rest", "apps/rest")
     .aggregate(storageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, dropboxFileStorageService, fileStorageService, h2StorageService)
     .dependsOn(storageService, models, youtubeDlWrapper, downloader, downloaderSynch, downloaderAsynch, dropboxFileStorageService, fileStorageService, h2StorageService)
-    .settings(libraryDependencies ++= Seq(config, scalazCore) ++ spray ++ metrics ++ logs ++ akka ++ Seq(dropbox) ++ oauth)
-    .enablePlugins(JavaServerAppPackaging)
-
+    .settings(libraryDependencies ++= Seq(config, scalazCore) ++ spray ++ metrics ++ logs ++ akka ++ Seq(dropbox) ++ oauth,
+      maintainer in Linux := "Denis Karpenko <denis@karpenko.me>",
+      packageSummary in Linux := "keep.place application",
+      packageDescription := "keep.place application"
+    ).enablePlugins(JavaServerAppPackaging)
 
   lazy val storageService = baseProject("storage-base", "services/storage/base") dependsOn (models)
     .settings(libraryDependencies ++= scalaz)
