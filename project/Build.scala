@@ -9,6 +9,7 @@ object VideoPodcastDownloader extends Build {
   import App.Dependencies._
   import com.typesafe.sbt.SbtNativePackager._
   import com.typesafe.sbt.packager.Keys._
+  import com.typesafe.sbt.packager.archetypes.ServerLoader.SystemV
 
 
   lazy val root = baseProject("video-podcast-downloader-rest", "apps/rest")
@@ -17,7 +18,8 @@ object VideoPodcastDownloader extends Build {
     .settings(libraryDependencies ++= Seq(config, scalazCore) ++ spray ++ metrics ++ logs ++ akka ++ Seq(dropbox) ++ oauth,
       maintainer in Linux := "Denis Karpenko <denis@karpenko.me>",
       packageSummary in Linux := "keep.place application",
-      packageDescription := "keep.place application"
+      packageDescription := "keep.place application",
+      serverLoading in Debian := SystemV
     ).enablePlugins(JavaServerAppPackaging, DebianPlugin)
 
   lazy val storageService = baseProject("storage-base", "services/storage/base") dependsOn (models)
