@@ -16,7 +16,7 @@ trait AppBuildSettings {
     scalacOptions += s"-target:jvm-${jdkVersion.value}",
     javacOptions ++=
       Seq("-source", jdkVersion.value, "-target", jdkVersion.value),
-    javaOptions += "-Xmx512M",
+    javaOptions += "-Xmx256M",
     javaOptions += "-XX:MaxMetaspaceSize=128M",
     scalaVersion := buildScalaVersion,
     crossPaths := false,
