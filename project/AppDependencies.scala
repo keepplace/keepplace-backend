@@ -29,7 +29,7 @@ trait AppDependencies {
     "com.typesafe.akka" %% "akka-testkit" % akkaVer
   )
 
-  val config = "com.typesafe" % "config" % "1.0.0"
+  val config = "com.typesafe" % "config" % "1.3.0"
 
 
   val h2 = Seq(
