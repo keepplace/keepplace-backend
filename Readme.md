@@ -1,7 +1,7 @@
 ## Get started
 ### Installing deps
 ```bash
-brew install youtube-dl ffmpeg libav
+brew install youtube-dl ffmpeg libav fakeroot
 ```
 ### Creating database
 
@@ -16,7 +16,7 @@ java -jar apps/rest/target/universal/stage/lib/org.liquibase.liquibase-core-*.ja
   --username=video \
   --password=video \
   --changeLogFile=migrations/changelog.xml \
-  --url="jdbc:h2:./test" \
+  --url="jdbc:h2:./keep_place_development" \
   "update"
 ```
 
