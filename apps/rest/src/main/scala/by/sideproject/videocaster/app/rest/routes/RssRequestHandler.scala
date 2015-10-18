@@ -5,18 +5,12 @@ import java.util.UUID
 import akka.actor.ActorContext
 import by.sideproject.videocaster.app.rest.oauth.dropbox.DropboxAuthService
 import by.sideproject.videocaster.app.rest.routes.base.BaseAPI
-import by.sideproject.videocaster.model.VideoItemDetails
-import by.sideproject.videocaster.model.filestorage.FileMeta
 import by.sideproject.videocaster.model.rss.{PodcastChannel, PodcastItem}
 import by.sideproject.videocaster.services.storage.base.StorageService
-import shapeless.Tuple
 import spray.http._
 import spray.httpx.marshalling.Marshaller
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Try, Success, Failure}
 import scala.xml.Elem
-import scalaz.OptionT
 
 class RssRequestHandler(storageService: StorageService, domain: String)
                        (implicit context: ActorContext)
@@ -67,9 +61,9 @@ class RssRequestHandler(storageService: StorageService, domain: String)
       </rss>
     }
 
-  private def rssUrl = s"http://$domain/rss/"
+  private def rssUrl = s"$domain/rss/"
 
-  private def videoUrl(id: Int) = s"http://$domain/videos/$id"
+  private def videoUrl(id: Int) = s"$domain/videos/$id"
 
   private def podcastItemsMarshaller(items: Seq[PodcastItem]) =
     items.map { data =>
