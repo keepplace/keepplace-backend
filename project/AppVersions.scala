@@ -5,7 +5,7 @@ trait AppVersions {
   val oauthVer= "1.20.0"
   val metricsVer = "2.1.2"
   val logbackVer = "1.1.3"
-  val scalazVersion = "7.1.3"
+  val scalazVersion = "7.1.4"
   val specs2Ver = "3.6.4"
   val dropboxVer = "1.8.1"
   val sl4jVer = "1.7.12"
