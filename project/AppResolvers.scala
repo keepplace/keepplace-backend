@@ -3,8 +3,6 @@ import sbt._
 trait AppResolvers {
   val typesafeReleaseRepo = "Typesafe Release Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
-  val sonatypeSnapshot = Resolver.sonatypeRepo("snapshots")
-
   val scalaToolsRepo = "Scala Tools Repository" at "https://oss.sonatype.org/content/groups/scala-tools/"
 
   val sprayDevRepo = "Spray Dev Repository" at "http://nightlies.spray.io/"
