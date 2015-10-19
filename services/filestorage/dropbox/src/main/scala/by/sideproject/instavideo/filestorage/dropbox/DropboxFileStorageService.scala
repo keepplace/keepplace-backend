@@ -84,8 +84,6 @@ class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
           fileRemover !(client, fileForRemoval)
 
           fileForRemoval.id.map(fileMetaDao.removeById)
-
-          log.warn("TODO/ Remove file from file system")
         }
       }
 

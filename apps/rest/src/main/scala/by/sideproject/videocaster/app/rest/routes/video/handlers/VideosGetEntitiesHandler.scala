@@ -17,9 +17,9 @@ class VideosGetEntitiesHandler(videoDetailsDAO: VideoItemDetailsDAO) extends Act
 
 
   override def receive = {
-    case VideosGetEntitiesRequest(ctx) => {
+    case VideosGetEntitiesRequest(ctx, profileId) => {
       log.debug(s"Processing get all videos request")
-      ctx.complete(videoDetailsDAO.findAll())
+      videoDetailsDAO.findAllByProfileId(profileId).map(ctx.complete(_))
     }
   }
 }

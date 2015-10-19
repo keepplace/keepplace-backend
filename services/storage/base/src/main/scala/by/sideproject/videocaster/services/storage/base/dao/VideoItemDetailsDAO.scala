@@ -2,4 +2,8 @@ package by.sideproject.videocaster.services.storage.base.dao
 
 import by.sideproject.videocaster.model.VideoItemDetails
 
-trait VideoItemDetailsDAO extends BaseDAO[VideoItemDetails, Int]
+import scala.concurrent.Future
+
+trait VideoItemDetailsDAO extends BaseDAO[VideoItemDetails, Int] {
+  def findAllByProfileId(profileId: Int): Future[Seq[VideoItemDetails]]
+}

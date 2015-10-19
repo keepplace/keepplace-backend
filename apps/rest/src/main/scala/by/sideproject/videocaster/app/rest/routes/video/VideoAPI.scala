@@ -36,8 +36,10 @@ class VideoAPI(storageService: StorageService,
     pathPrefix("videos") {
       authenticate(cookieAuth) { identity =>
         pathEnd {
-          get {
-            ctx => videosGetentitiesHandler ! VideosGetEntitiesRequest(ctx)
+          get { ctx =>
+            identity.id.map { id =>
+              videosGetentitiesHandler ! VideosGetEntitiesRequest(ctx, id)
+            }
           } ~
             post {
               entity(as[AddVideoRequest]) { request =>

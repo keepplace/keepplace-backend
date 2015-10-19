@@ -48,7 +48,7 @@ class RssRequestHandler(storageService: StorageService, domain: String)
           </itunes:owner>
           <language>ru-ru</language>
           <itunes:explicit>no</itunes:explicit>
-          <link>http://{domain}/</link>
+          <link>{domain}/</link>
           <title>My instavideo feed</title>
           <description>
             Description: My instavideo feed
