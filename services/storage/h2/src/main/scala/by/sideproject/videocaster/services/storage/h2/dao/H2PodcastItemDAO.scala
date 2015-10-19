@@ -18,7 +18,7 @@ class H2PodcastItemDAO
 
    val podcastItemAttrs=  for {
       (details, file) <- videoItemDetailsDAO.tableQuery join fileMetaDAO.tableQuery on (_.fileMetaId === _.id) if details.status === "downloaded" && details.profileId === profileId
-    } yield (details.id, details.title, details.description, details.author, details.pubDate, file.secondaryDownloadURL)
+    } yield (details.id, details.title, details.description, details.author, details.pubDate, file.downloadURL)
 
     database.run(podcastItemAttrs.result).map{items =>
       items.map{
