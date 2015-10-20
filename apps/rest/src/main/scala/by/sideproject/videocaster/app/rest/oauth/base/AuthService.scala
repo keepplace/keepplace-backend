@@ -2,28 +2,19 @@ package by.sideproject.videocaster.app.rest.oauth.base
 
 import java.util.UUID
 
-import akka.actor.Props
 import by.sideproject.videocaster.app.rest.oauth.base.utils.OauthConfig
 import by.sideproject.videocaster.app.rest.rejections.LoginRedirectionRejection
-import by.sideproject.videocaster.app.rest.routes.video.handlers.VideosGetEntitiesHandler
-import by.sideproject.videocaster.model.auth.{DropboxIdentity, Profile, Identity}
-import by.sideproject.videocaster.services.storage.base.dao.{ProfileDAO, IdentityDAO}
-import com.dropbox.core.DbxClient
+import by.sideproject.videocaster.model.auth.{DropboxIdentity, Identity, Profile}
+import by.sideproject.videocaster.services.storage.base.dao.{IdentityDAO, ProfileDAO}
 import org.slf4j.LoggerFactory
 import spray.http.HttpCookie
 import spray.http.StatusCodes._
-import spray.routing
 import spray.routing._
 import spray.routing.authentication._
 import spray.routing.directives.AuthMagnet
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util
-import scala.util.Random
 
-/**
- * TODO: Introduce 2 separate services for storing Identities and Sessions.
- */
 trait AuthService
   extends HttpService {
   private val log = LoggerFactory.getLogger(this.getClass)
