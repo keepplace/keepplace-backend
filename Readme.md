@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/keepplace/keepplace-backend.svg)](https://travis-ci.org/keepplace/keepplace-backend)
+[![Coverage Status](https://coveralls.io/repos/keepplace/keepplace-backend/badge.svg?branch=wip&service=github)](https://coveralls.io/github/keepplace/keepplace-backend?branch=wip)
+
 ## Get started
 ### Installing deps
 ```bash
@@ -41,6 +44,17 @@ http://localhost:8080/auth/login
 ```bash
 curl -XGET --cookie "SID=5b73e1e6-0bc5-47bc-b1bd-ce3fb1336507" http://localhost:8080/auth/profile
 ```
+
+```json
+{
+  id: 123,
+  username: "Ritchard White",
+  dropboxId: "1234567",
+  rssToken: "d481e7c2-669c-41f1-b8e4-a6c00502b6c1"
+}
+
+```
+
 
 ### RSS channel
 

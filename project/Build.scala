@@ -2,6 +2,7 @@ import com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging
 import com.typesafe.sbt.packager.debian.DebianPlugin
 import sbt.Keys._
 import sbt._
+import scoverage.{ScoverageSbtPlugin, ScoverageKeys}
 
 object VideoPodcastDownloader extends Build {
 
@@ -21,7 +22,7 @@ object VideoPodcastDownloader extends Build {
       packageDescription := "keep.place application",
       serverLoading in Debian := SystemV
     ).enablePlugins(JavaServerAppPackaging, DebianPlugin)
-
+//
   lazy val storageService = baseProject("storage-base", "services/storage/base") dependsOn (models)
     .settings(libraryDependencies ++= scalaz)
 
