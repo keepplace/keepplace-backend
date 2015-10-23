@@ -2,12 +2,12 @@ package keep.place.app.rest.routes.video
 
 import akka.actor.{ActorContext, Props}
 import akka.util.Timeout
-import keep.place.filestorage.base.FileStorageService
 import keep.place.app.rest.oauth.dropbox.DropboxAuthService
 import keep.place.app.rest.routes.base.BaseAPI
 import keep.place.app.rest.routes.base.requests.EntityRequest
 import keep.place.app.rest.routes.video.handlers._
 import keep.place.app.rest.routes.video.requests._
+import keep.place.filestorage.base.FileStorageService
 import keep.place.model.video.AddVideoRequest
 import keep.place.services.downloader.base.DownloadService
 import keep.place.services.storage.base.StorageService
@@ -31,15 +31,13 @@ class VideoAPI(storageService: StorageService,
 
   val route = {
     import keep.place.app.rest.formaters.json.InstaVideoJsonProtocol._
-    import spray.httpx.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
+    import spray.httpx.SprayJsonSupport.sprayJsonUnmarshaller
 
     pathPrefix("videos") {
       authenticate(cookieAuth) { identity =>
         pathEnd {
           get { ctx =>
-            identity.id.map { id =>
-              videosGetentitiesHandler ! VideosGetEntitiesRequest(ctx, id)
-            }
+            videosGetentitiesHandler ! VideosGetEntitiesRequest(ctx, identity.profileId)
           } ~
             post {
               entity(as[AddVideoRequest]) { request =>
