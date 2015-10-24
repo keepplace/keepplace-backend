@@ -17,6 +17,7 @@ class VideoItemDetailsT(tag: Tag) extends BaseT[VideoItemDetails](tag ,"VIDEO_IT
   def note = column[String]("NOTE")
   def status = column[String]("STATUS")
   def profileId = column[Int]("PROFILE_ID")
+  def thumbnail = column[String]("THUMBNAIL_URL")
 
-  override def * =  (id.?, title.?, description.?, fileMetaId.?, originUrl, addDate, status, pubDate.?, author.?, note.?, profileId) <> ((VideoItemDetails.apply _).tupled, VideoItemDetails.unapply)
+  override def * =  (id.?, title.?, description.?, fileMetaId.?, originUrl, addDate, status, pubDate.?, author.?, note.?, thumbnail.?, profileId) <> ((VideoItemDetails.apply _).tupled, VideoItemDetails.unapply)
 }

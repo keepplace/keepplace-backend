@@ -10,6 +10,7 @@ case class VideoItemDetails(id: Option[Int],
                             pubDate: Option[String],
                             author: Option[String],
                             note: Option[String],
+                            thumbnail: Option[String],
                             profileId: Int
                              ) extends BaseObject[Int] {
 

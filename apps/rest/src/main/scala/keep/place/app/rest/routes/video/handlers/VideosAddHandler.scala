@@ -21,7 +21,7 @@ class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: Do
 
   implicit def videoItemDownloadDetailsToVideoItemDetails(downloadDetails: VideoItemDownloadDetails)(implicit identity: Identity) : VideoItemDetails =
     VideoItemDetails(None, downloadDetails.title.some, downloadDetails.description.some, None, downloadDetails.ur, "today",
-      "info", downloadDetails.pubDate.some, downloadDetails.author.some, None, identity.profileId)
+      "info", downloadDetails.pubDate.some, downloadDetails.author.some, None, downloadDetails.thumbnail, identity.profileId)
 
   override def receive = {
     case VideosAddRequest(ctx, request, user) => {

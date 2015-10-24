@@ -8,6 +8,9 @@ import keep.place.model.util.Error
 import org.json.{JSONException, JSONObject}
 import org.slf4j.LoggerFactory
 
+import scalaz.Scalaz._
+import scalaz._
+
 class YoutubeDL {
 
   val log = LoggerFactory.getLogger(this.getClass)
@@ -38,8 +41,14 @@ class YoutubeDL {
       val description: String = youtubeDlJsonOutput.getString("description")
       val author: String = youtubeDlJsonOutput.getString("uploader")
       val pubDate: String = youtubeDlJsonOutput.getString("upload_date") //20150820
+      val thumbnails = youtubeDlJsonOutput.getJSONArray("thumbnails")
+      val thumbnail = if(!thumbnails.isNull(0)){
+        thumbnails.getJSONObject(0).getString("url").some
+      } else {
+        none
+      }
 
-      Right(DownloadedFileInfo(fileName, title, description, pubDate, author, youtubeDlJsonOutput.toString(4)))
+      Right(DownloadedFileInfo(fileName, title, description, pubDate, author, thumbnail, youtubeDlJsonOutput.toString(4)))
 
     } catch {
       case e: JSONException => {

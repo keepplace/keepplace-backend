@@ -23,7 +23,7 @@ class SynchronusDownloadService(youDl: YoutubeDL, storage: StorageService, binar
     videoInfoResult match {
       case Right(videoInfo) => {
         log.debug("Information on video item has been retrieved: " + videoInfo)
-        Right(VideoItemDownloadDetails(videoInfo.title, videoInfo.description, url, videoInfo.pubDate, videoInfo.author))
+        Right(VideoItemDownloadDetails(videoInfo.title, videoInfo.description, url, videoInfo.pubDate, videoInfo.author, videoInfo.thumbnail ))
       }
       case Left(error) => Left(error)
     }
