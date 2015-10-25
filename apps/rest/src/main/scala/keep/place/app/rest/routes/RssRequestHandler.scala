@@ -44,19 +44,20 @@ class RssRequestHandler(storageService: StorageService, domain: String)
         <channel>
           <atom:link href={rssUrl} type="application/rss+xml" rel="self"></atom:link>
           <itunes:owner>
-            <itunes:email>info@sideproject.by</itunes:email>
+            <itunes:email>admin@keep.place</itunes:email>
           </itunes:owner>
-          <language>ru-ru</language>
+          <language>en-us</language>
           <itunes:explicit>no</itunes:explicit>
           <link>{domain}/</link>
-          <title>My instavideo feed</title>
+          <title>Keep Place feed</title>
           <description>
-            Description: My instavideo feed
+            My Keep.Place feed
           </description>
           <itunes:summary>
-            Description: My instavideo feed
+            My Keep.Place feed
           </itunes:summary>
-          <itunes:author>info@sideproject.by</itunes:author>{podcastItemsMarshaller(data.items)}
+          <itunes:author>admin@keep.place</itunes:author>
+          {podcastItemsMarshaller(data.items)}
         </channel>
       </rss>
     }
@@ -96,6 +97,7 @@ class RssRequestHandler(storageService: StorageService, domain: String)
         <pubDate>
           {data.pubDate}
         </pubDate>
+        {data.thumbnail.map(thumbnail => <itunes:image href={thumbnail}/>).getOrElse("")}
       </item>
     }
 

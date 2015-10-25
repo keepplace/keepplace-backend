@@ -1,17 +1,13 @@
 package keep.place.app.rest.formaters.json
 
 import keep.place.model.VideoItemDetails
-import keep.place.model.auth.{Profile, Identity}
 import keep.place.model.auth.oauth.OAuth2Info
-import keep.place.model.rss.{PodcastChannel, PodcastItem}
+import keep.place.model.auth.{Identity, Profile}
 import keep.place.model.util.Error
 import keep.place.model.video.AddVideoRequest
 import spray.json.{CollectionFormats, DefaultJsonProtocol}
 
 object InstaVideoJsonProtocol extends DefaultJsonProtocol with CollectionFormats {
-
-  implicit val podcastItemFormat = jsonFormat6(PodcastItem)
-  implicit val podcastChannelFormat = jsonFormat1(PodcastChannel)
 
   implicit val videoItemDetailsFormat = jsonFormat12(VideoItemDetails)
   implicit val addVideoRequestFormat = jsonFormat1(AddVideoRequest)
