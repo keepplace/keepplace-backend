@@ -12,7 +12,7 @@ import spray.httpx.marshalling.Marshaller
 
 import scala.xml.Elem
 
-class RssRequestHandler(storageService: StorageService, domain: String)
+class RssAPI(storageService: StorageService, domain: String)
                        (implicit context: ActorContext)
   extends DropboxAuthService(storageService.identityDAO, storageService.profileDAO)
   with BaseAPI {
