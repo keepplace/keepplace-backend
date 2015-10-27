@@ -58,7 +58,6 @@ trait AppDependencies {
     "io.spray" %% "spray-json" % sprayJsonVer
 
   )
-  val sprayClient = "io.spray" %% "spray-client" % sprayVer
 
   val sprayTestKit = "io.spray" %% "spray-testkit" % sprayVer excludeAll (ExclusionRule(organization = "org.specs2"))
 
