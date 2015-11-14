@@ -15,7 +15,7 @@ class H2VideoItemDetailsDAO
   with VideoItemDetailsDAO {
 
   override def findAllByProfileId(profileId: Int): Future[Seq[VideoItemDetails]] = {
-    database.run(tableQuery.filter(_.profileId === profileId).result)
+    database.run(tableQuery.filter(_.profileId === profileId).sortBy(_.addDate.desc).result)
   }
 
 }
