@@ -1,5 +1,8 @@
 package keep.place.app.rest.routes.video.handlers
 
+import java.text.SimpleDateFormat
+import java.util.Calendar
+
 import akka.actor.Actor
 import keep.place.app.rest.routes.video.requests.VideosAddRequest
 import keep.place.model.auth.Identity
@@ -15,12 +18,19 @@ class VideosAddHandler(videoDetailsDAO: VideoItemDetailsDAO, downloadService: Do
                       (implicit executionContext: ExecutionContext) extends Actor {
 
   import keep.place.app.rest.formaters.json.InstaVideoJsonProtocol._
-  import spray.httpx.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}
+  import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
 
   val log = LoggerFactory.getLogger(this.getClass)
 
+  val dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+
+  def currentDateTime = dateFormat.format(Calendar.getInstance().getTime())
+
+
+
+
   implicit def videoItemDownloadDetailsToVideoItemDetails(downloadDetails: VideoItemDownloadDetails)(implicit identity: Identity) : VideoItemDetails =
-    VideoItemDetails(None, downloadDetails.title.some, downloadDetails.description.some, None, downloadDetails.ur, "today",
+    VideoItemDetails(None, downloadDetails.title.some, downloadDetails.description.some, None, downloadDetails.ur, currentDateTime,
       "info", downloadDetails.pubDate.some, downloadDetails.author.some, None, downloadDetails.thumbnail, identity.profileId)
 
   override def receive = {
