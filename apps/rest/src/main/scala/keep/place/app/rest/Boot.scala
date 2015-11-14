@@ -31,7 +31,7 @@ class ApplicationKernel extends akka.kernel.Bootable {
   implicit val youtubeDl = new YoutubeDL
 
   implicit val synchDownloadService : DownloadService = new SynchronusDownloadService(youtubeDl, metaStorageService, binaryStorageService)
-  implicit val downloadActor : ActorRef = actorSystem.actorOf(Props(new DownloadActor(synchDownloadService)).withDispatcher("binary-download-dispatcher"))
+  implicit val downloadActor : ActorRef = actorSystem.actorOf(Props(new DownloadActor(synchDownloadService)).withDispatcher("video-download-dispatcher"))
   implicit val downloadService : DownloadService = new AsynchronousDownloadService(downloadActor, synchDownloadService)
 
 

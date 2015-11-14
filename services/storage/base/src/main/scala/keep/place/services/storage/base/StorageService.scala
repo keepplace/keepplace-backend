@@ -7,7 +7,7 @@ trait StorageService
   with FileMetaDAOComponent
   with IdentityDAOComponent
   with ProfileDAOComponent
-  with PodcastItemDAOComponent {
+  with VideoItemDtoDAOComponent {
 
   def shoutdown
 }

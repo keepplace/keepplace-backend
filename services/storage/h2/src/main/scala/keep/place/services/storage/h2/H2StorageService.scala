@@ -13,7 +13,7 @@ class H2StorageService(implicit executionContext: ExecutionContext)
   with H2FileMetaDAOComponent
   with H2IdentityDAOComponent
   with H2ProfileDAOComponent
-  with H2PodcastItemDAOComponent {
+  with H2VideoItemDtoDAOComponent {
 
 
   implicit val database = Database.forConfig("database")

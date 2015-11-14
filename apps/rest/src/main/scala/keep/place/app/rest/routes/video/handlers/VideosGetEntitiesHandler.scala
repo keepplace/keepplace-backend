@@ -2,12 +2,12 @@ package keep.place.app.rest.routes.video.handlers
 
 import akka.actor.Actor
 import keep.place.app.rest.routes.video.requests.VideosGetEntitiesRequest
-import keep.place.services.storage.base.dao.VideoItemDetailsDAO
+import keep.place.services.storage.base.dao.{VideoItemDtoDAO, VideoItemDetailsDAO}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
 
-class VideosGetEntitiesHandler(videoDetailsDAO: VideoItemDetailsDAO) extends Actor {
+class VideosGetEntitiesHandler(videoDetailsDAO: VideoItemDtoDAO) extends Actor {
 
   import keep.place.app.rest.formaters.json.InstaVideoJsonProtocol._
   import spray.httpx.SprayJsonSupport.{sprayJsonMarshaller, sprayJsonUnmarshaller}

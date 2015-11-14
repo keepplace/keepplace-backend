@@ -17,7 +17,7 @@ class RssAPI(storageService: StorageService, domain: String)
   extends DropboxAuthService(storageService.identityDAO, storageService.profileDAO)
   with BaseAPI {
 
-  private val podcastItemDAO = storageService.podcastItemDAO
+  private val podcastItemDAO = storageService.videoItemDtoDAO
 
   private implicit def uuidToString(uuid: UUID): String = uuid.toString
 
