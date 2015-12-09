@@ -41,7 +41,7 @@ class LoginHandler(storageService: StorageService)
       path("login") {
         get{
           authenticate(loginRedirectionAuth) { identity =>
-            redirect("/auth/profile", StatusCodes.Found)
+            redirect("/api/auth/profile", StatusCodes.Found)
           }
         }
       }

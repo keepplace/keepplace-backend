@@ -36,8 +36,11 @@ class SprayApp(
 
   def receive = runRoute(
 
-    new LoginHandler(storageService).route ~ pathPrefix("api") {
-      new VideoAPI(storageService, downloadService, binaryStorageService).route ~ new DownloadAPI(binaryStorageService, storageService.fileMetaDAO).route ~ new RssAPI(storageService, domain).route
+    pathPrefix("api") {
+      new LoginHandler(storageService).route ~
+        new VideoAPI(storageService, downloadService, binaryStorageService).route ~
+        new DownloadAPI(binaryStorageService, storageService.fileMetaDAO).route ~
+        new RssAPI(storageService, domain).route
     }
 
   )
