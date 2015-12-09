@@ -62,9 +62,9 @@ class RssAPI(storageService: StorageService, domain: String)
       </rss>
     }
 
-  private def rssUrl = s"$domain/rss/"
+  private def rssUrl = s"$domain/api/rss/"
 
-  private def videoUrl(id: Int) = s"$domain/videos/$id"
+  private def videoUrl(id: Int) = s"$domain/api/videos/$id"
 
   private def podcastItemsMarshaller(items: Seq[PodcastItem]) =
     items.map { data =>

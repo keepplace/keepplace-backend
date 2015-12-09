@@ -68,7 +68,7 @@ abstract class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
 
   override def getInfo(id: Int): Future[Option[FileMeta]] = fileMetaDao.findOneById(id)
 
-  protected def fileURL(id: String) = domain + "/data/" + id + "/download"
+  protected def fileURL(id: String) = domain + "/api/data/" + id + "/download"
 
   protected def generateDownloadToken = UUID.randomUUID().toString
 }

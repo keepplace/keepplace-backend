@@ -2,23 +2,23 @@ package keep.place.app.rest.actors
 
 import akka.actor.Actor
 import akka.util.Timeout
-import keep.place.filestorage.base.FileStorageService
 import keep.place.app.rest.oauth.base.utils.OauthConfig
 import keep.place.app.rest.rejections.LoginRedirectionRejection
 import keep.place.app.rest.routes.download.DownloadAPI
 import keep.place.app.rest.routes.video.VideoAPI
 import keep.place.app.rest.routes.{LoginHandler, RssAPI}
+import keep.place.filestorage.base.FileStorageService
 import keep.place.services.downloader.base.DownloadService
 import keep.place.services.storage.base.StorageService
 import org.slf4j.LoggerFactory
 import spray.http.StatusCodes._
-import spray.routing.{RejectionHandler, HttpService}
+import spray.routing.{HttpService, RejectionHandler}
 
 class SprayApp(
                 storageService: StorageService,
                 downloadService: DownloadService,
                 binaryStorageService: FileStorageService,
-                domain: String)(implicit timeout : Timeout)
+                domain: String)(implicit timeout: Timeout)
   extends Actor
   with HttpService {
 
@@ -35,10 +35,11 @@ class SprayApp(
 
 
   def receive = runRoute(
-    new RssAPI(storageService, domain).route
-    ~ new VideoAPI(storageService, downloadService, binaryStorageService).route
-    ~ new DownloadAPI(binaryStorageService, storageService.fileMetaDAO).route
-    ~ new LoginHandler(storageService).route
+
+    new LoginHandler(storageService).route ~ pathPrefix("api") {
+      new VideoAPI(storageService, downloadService, binaryStorageService).route ~ new DownloadAPI(binaryStorageService, storageService.fileMetaDAO).route ~ new RssAPI(storageService, domain).route
+    }
+
   )
 
 }

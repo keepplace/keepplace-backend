@@ -23,10 +23,10 @@ class VideoAPI(storageService: StorageService,
   protected val log = LoggerFactory.getLogger(this.getClass)
 
   private lazy val videoDetailsDAO: VideoItemDetailsDAO = storageService.videoItemDetailsDAO
-  private lazy val videosGetentitiesHandler = context.actorOf(Props(new VideosGetEntitiesHandler(videoDetailsDAO)))
+  private lazy val videosGetentitiesHandler = context.actorOf(Props(new VideosGetEntitiesHandler(storageService.videoItemDtoDAO)))
   private lazy val videosGetEntityHandler = context.actorOf(Props(new VideosGetEntityHandler(videoDetailsDAO)))
   private lazy val videosAddHandler = context.actorOf(Props(new VideosAddHandler(videoDetailsDAO, downloadService)))
-  private lazy val videosDeleteEntityHandler = context.actorOf(Props(new VideosDeleteEntityHandler(videoDetailsDAO, binaryStorageService)))
+  private lazy val videosDeleteEntityHandler = context.actorOf(Props(new VideosDeleteEntityHandler(videoDetailsDAO, storageService.fileMetaDAO, binaryStorageService)))
 
 
   val route = {
