@@ -8,5 +8,6 @@ import scala.concurrent.Future
 trait VideoItemDtoDAO {
   def fetchPodcastItems(profileId: Int): Future[Seq[PodcastItem]]
   def findAllByProfileId(profileId: Int): Future[Seq[VideoItemDetailsDTO]]
+  def findOneById(profileId: Int, id: Int): Future[Option[VideoItemDetailsDTO]]
 
 }

@@ -28,6 +28,20 @@ class H2VideoItemDtoDAO
     }
 
   }
+
+  def findOneById(profileId: Int, id: Int): Future[Option[VideoItemDetailsDTO]] = {
+    val podcastItemAttrs = for {
+      (details, file) <- videoItemDetailsDAO.tableQuery joinLeft fileMetaDAO.tableQuery on (_.fileMetaId === _.id) if details.id === id
+    } yield (details.id, details.title.?, details.description.?, details.originUrl, details.addDate, details.status, details.author.?, details.pubDate.?, file.flatMap(_.downloadURL.?), details.thumbnail.?)
+
+    database.run(podcastItemAttrs.result).map { items =>
+      items.headOption.map {
+        case (id, title, description, originUrl, addDate, status, author, pubDate, downlodadURL, thumbnail) => VideoItemDetailsDTO(id, title, description, originUrl, addDate, status, pubDate, author, thumbnail, downlodadURL)
+      }
+    }
+  }
+
+
   override def fetchPodcastItems(profileId: Int): Future[Seq[PodcastItem]] = {
 
    val podcastItemAttrs=  for {

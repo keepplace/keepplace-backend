@@ -11,7 +11,6 @@ import keep.place.filestorage.base.FileStorageService
 import keep.place.model.video.AddVideoRequest
 import keep.place.services.downloader.base.DownloadService
 import keep.place.services.storage.base.StorageService
-import keep.place.services.storage.base.dao.VideoItemDetailsDAO
 import org.slf4j.LoggerFactory
 
 class VideoAPI(storageService: StorageService,
@@ -22,11 +21,10 @@ class VideoAPI(storageService: StorageService,
 
   protected val log = LoggerFactory.getLogger(this.getClass)
 
-  private lazy val videoDetailsDAO: VideoItemDetailsDAO = storageService.videoItemDetailsDAO
   private lazy val videosGetentitiesHandler = context.actorOf(Props(new VideosGetEntitiesHandler(storageService.videoItemDtoDAO)))
-  private lazy val videosGetEntityHandler = context.actorOf(Props(new VideosGetEntityHandler(videoDetailsDAO)))
-  private lazy val videosAddHandler = context.actorOf(Props(new VideosAddHandler(videoDetailsDAO, downloadService)))
-  private lazy val videosDeleteEntityHandler = context.actorOf(Props(new VideosDeleteEntityHandler(videoDetailsDAO, storageService.fileMetaDAO, binaryStorageService)))
+  private lazy val videosGetEntityHandler = context.actorOf(Props(new VideosGetEntityHandler(storageService.videoItemDtoDAO)))
+  private lazy val videosAddHandler = context.actorOf(Props(new VideosAddHandler(storageService.videoItemDetailsDAO, downloadService)))
+  private lazy val videosDeleteEntityHandler = context.actorOf(Props(new VideosDeleteEntityHandler(storageService.videoItemDetailsDAO, storageService.fileMetaDAO, binaryStorageService)))
 
 
   val route = {

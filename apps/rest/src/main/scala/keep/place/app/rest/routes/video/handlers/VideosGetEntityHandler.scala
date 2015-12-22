@@ -2,7 +2,7 @@ package keep.place.app.rest.routes.video.handlers
 
 import akka.actor.Actor
 import keep.place.app.rest.routes.base.requests.EntityRequest
-import keep.place.services.storage.base.dao.VideoItemDetailsDAO
+import keep.place.services.storage.base.dao.{VideoItemDtoDAO, VideoItemDetailsDAO}
 import org.slf4j.LoggerFactory
 import spray.http.{HttpResponse, StatusCodes}
 import spray.httpx.marshalling.ToResponseMarshaller
@@ -11,7 +11,7 @@ import spray.routing.AuthorizationFailedRejection
 import scala.concurrent.ExecutionContext
 import scala.util.Success
 
-class VideosGetEntityHandler(videoDetailsDAO: VideoItemDetailsDAO)
+class VideosGetEntityHandler(videoDetailsDAO: VideoItemDtoDAO)
                             (implicit executionContext: ExecutionContext) extends Actor {
 
   import keep.place.app.rest.formaters.json.InstaVideoJsonProtocol._
@@ -27,14 +27,8 @@ class VideosGetEntityHandler(videoDetailsDAO: VideoItemDetailsDAO)
   override def receive = {
     case EntityRequest(ctx, id, identity) => {
       log.debug(s"Processing get video request: $id")
-      videoDetailsDAO.findOneById(id).onComplete {
-        case Success(Some(item)) => {
-          if (item.profileId == identity.profileId) {
-            ctx.complete(item)
-          } else {
-            ctx.reject(AuthorizationFailedRejection)
-          }
-        }
+      videoDetailsDAO.findOneById(identity.profileId, id).onComplete {
+        case Success(Some(item)) => ctx.complete(item)
         case Success(None) => ctx.complete(StatusCodes.NotFound)
       }
     }
