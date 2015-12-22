@@ -18,8 +18,8 @@ class H2VideoItemDtoDAO
   override def findAllByProfileId(profileId: Int): Future[Seq[VideoItemDetailsDTO]] = {
 
     val podcastItemAttrs = for {
-      (details, file) <- videoItemDetailsDAO.tableQuery join fileMetaDAO.tableQuery on (_.fileMetaId === _.id) if details.profileId === profileId
-    } yield (details.id, details.title.?, details.description.?, details.originUrl, details.addDate, details.status, details.author.?, details.pubDate.?, file.downloadURL.?, details.thumbnail.?)
+      (details, file) <- videoItemDetailsDAO.tableQuery joinLeft fileMetaDAO.tableQuery on (_.fileMetaId === _.id) if details.profileId === profileId
+    } yield (details.id, details.title.?, details.description.?, details.originUrl, details.addDate, details.status, details.author.?, details.pubDate.?, file.flatMap(_.downloadURL.?), details.thumbnail.?)
 
     database.run(podcastItemAttrs.result).map{items =>
       items.map{
