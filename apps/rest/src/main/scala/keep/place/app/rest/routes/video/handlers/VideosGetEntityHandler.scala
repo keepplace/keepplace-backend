@@ -29,7 +29,7 @@ class VideosGetEntityHandler(videoDetailsDAO: VideoItemDtoDAO)
       log.debug(s"Processing get video request: $id")
       videoDetailsDAO.findOneById(identity.profileId, id).onComplete {
         case Success(Some(item)) => ctx.complete(item)
-        case Success(None) => ctx.complete(StatusCodes.NotFound)
+        case _ => ctx.complete(StatusCodes.NotFound)
       }
     }
   }
