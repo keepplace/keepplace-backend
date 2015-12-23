@@ -4,7 +4,6 @@ import akka.actor.Actor
 import akka.util.Timeout
 import keep.place.app.rest.oauth.base.utils.OauthConfig
 import keep.place.app.rest.rejections.LoginRedirectionRejection
-import keep.place.app.rest.routes.download.DownloadAPI
 import keep.place.app.rest.routes.video.VideoAPI
 import keep.place.app.rest.routes.{LoginHandler, RssAPI}
 import keep.place.filestorage.base.FileStorageService
@@ -39,7 +38,6 @@ class SprayApp(
     pathPrefix("api") {
       new LoginHandler(storageService).route ~
         new VideoAPI(storageService, downloadService, binaryStorageService).route ~
-        new DownloadAPI(binaryStorageService, storageService.fileMetaDAO).route ~
         new RssAPI(storageService, domain).route
     }
 

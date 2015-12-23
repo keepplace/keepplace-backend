@@ -2,7 +2,18 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
-    <include file="changesets/db_schema.xml" relativeToChangelogFile="true"/>
-    <include file="changesets/add_thumbnail_to_video_details.xml" relativeToChangelogFile="true"/>
-    <include file="changesets/003.remove_secondary_url.xml" relativeToChangelogFile="true"/>
+    <changeSet author="dkarpenko" id="3">
+
+        <sql>UPDATE FILE_METAS SET DOWNLOAD_URL=SECONDARY_DOWNLOAD_URL;</sql>
+
+    </changeSet>
+
+    <changeSet author="dkarpenko" id="4">
+
+        <dropColumn tableName="FILE_METAS" columnName="DOWNLOAD_ID"/>
+        <dropColumn tableName="FILE_METAS" columnName="SECONDARY_DOWNLOAD_URL"/>
+
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -57,10 +57,7 @@ class DropboxFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
       val fileName: String = inputFile.getName
       inputFile.delete()
 
-
-      val downloadId = generateDownloadToken
-
-      val meta = new FileMeta(None, downloadId, fileURL(downloadId), Some(sharableUrl.replace("dl=0", "dl=1")), fileName, "remote", uploadedFilePath)
+      val meta = new FileMeta(None, sharableUrl.replace("dl=0", "dl=1"), fileName, "remote", uploadedFilePath)
       fileMetaDao.insert(meta).map(generatedId => meta.copy(id = generatedId.some).some)
 
     }

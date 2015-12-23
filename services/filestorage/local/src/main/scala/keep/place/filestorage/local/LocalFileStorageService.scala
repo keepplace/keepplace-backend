@@ -1,6 +1,5 @@
 package keep.place.filestorage.local
 
-import java.io.File
 import java.util.UUID
 
 import keep.place.filestorage.base.FileStorageService
@@ -15,28 +14,6 @@ import scala.concurrent.{ExecutionContext, Future}
 abstract class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String)(implicit executionContext: ExecutionContext) extends FileStorageService {
 
   private val log = LoggerFactory.getLogger(this.getClass)
-
-  /**
-   * 1) Takes file on filesystem.
-   * 2) Stores it in internal storage.
-   * 3) Removes original file.
-   * @param path - path to the file on file system.
-   * @return unique identifier of the file
-   */
-  override def upload(path: String, account: Identity): Future[Option[FileMeta]] = {
-
-    val fileName: String = new File(path).getName
-
-    val downloadId = generateDownloadToken
-    val meta = new FileMeta(None, downloadId, fileURL(downloadId), None, fileName, "local", path)
-
-    for {
-      insertedFileMetaId <- fileMetaDao.insert(meta)
-    } yield {
-      Some(meta)
-    }
-
-  }
 
   override def getData(id: Int): Future[Option[FileData]] = {
 
@@ -67,8 +44,6 @@ abstract class LocalFileStorageService(fileMetaDao: FileMetaDAO, domain: String)
   }
 
   override def getInfo(id: Int): Future[Option[FileMeta]] = fileMetaDao.findOneById(id)
-
-  protected def fileURL(id: String) = domain + "/api/data/" + id + "/download"
 
   protected def generateDownloadToken = UUID.randomUUID().toString
 }
