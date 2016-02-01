@@ -38,11 +38,11 @@ class YoutubeDL {
 
       val fileName: String = youtubeDlJsonOutput.getString("_filename")
       val title: String = youtubeDlJsonOutput.getString("fulltitle")
-      val description: String = youtubeDlJsonOutput.getString("description")
+      val description: String = youtubeDlJsonOutput.optString("description")
       val author: String = youtubeDlJsonOutput.getString("uploader")
-      val pubDate: String = youtubeDlJsonOutput.getString("upload_date") //20150820
-      val thumbnails = youtubeDlJsonOutput.getJSONArray("thumbnails")
-      val thumbnail = if(!thumbnails.isNull(0)){
+      val pubDate: String = youtubeDlJsonOutput.optString("upload_date") //20150820
+      val thumbnails = youtubeDlJsonOutput.optJSONArray("thumbnails")
+      val thumbnail = if(thumbnails != null && !thumbnails.isNull(0)){
         thumbnails.getJSONObject(0).getString("url").some
       } else {
         none
